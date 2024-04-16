@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Obliteration - Compatibility List</title>
+    <meta name="description" content="Obliteration is an experimental open-source PS4 emulator written in Rust for Windows, MacOS, and Linux.">
+    <meta name="keywords" content="Obliteration, playstation, ps4, playstation 4, emulator, windows, macOS, linux, open-source, rust, C++, obliteration github, obliteration discord, obliteration wiki">
+    <meta name="robots" content="index,follow">
+    <meta name="author" content="Obliteration">
+    <meta name="copyright" content="Obliteration">
+    <meta name="theme-color" content="#680600">
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Obliteration - Compatibility List"/>
+    <meta name="twitter:description" content="Here you can view all the tested games and apps on Obliteration."/>
+    <meta name="twitter:image:src" content="https://obliteration.net/_images/Obliteration.png"/>
+    <meta property="og:title" content="Obliteration - An experimental open-source PS4 emulator">
+    <meta property="og:description" content="Here you can view all the tested games and apps on Obliteration.">
+    <meta property="og:image" content="/_images/Obliteration.png">
+    <meta property="og:url" content="https://obliteration.net">
+    <link rel="icon" href="https://obliteration.net/_images/Obliteration-smoll.png" type="image/png">
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <link rel="stylesheet" href="/required.css">
+    <link rel="stylesheet" href="./styles.css">
+    <meta name="darkreader-lock"> <!-- for disabling dark mode with dark reader -->
+</head>
+<body>
+<header class="header" id="header"></header>
+<div class="menuContainer" id="menu"></div>
+
+<main class="main">
+    <div class="background">
+        <div class="backgroundPlane1"></div>
+        <div class="backgroundPlane2"></div>
+    </div>
+
+    <div class="compMenu">
+        <p class="compMenuText1">Compatibility List</p>
+        <p class="compMenuStuffText">These are the currently tested games and applications on Obliteration.<br>
+                                     Clicking on a card will redirect you to the GitHub issue.</p>
+
+        <div class="compMenuStatusWrap Playable">
+            <span class="compMenuStatusLabel">Playable</span>
+            <span class="compMenuStatusInfo" id="PlayablePercent"></span>
+            <span class="gameMenuStatusAmount" id="PlayableNumber"></span>
+            <div class="gameMenuStatusBar" id="PlayableBar" style="width: 0;"></div>
+        </div>
+
+        <div class="compMenuStatusWrap InGame">
+            <span class="compMenuStatusLabel">InGame</span>
+            <span class="compMenuStatusInfo" id="IngamePercent"></span>
+            <span class="gameMenuStatusAmount" id="IngameNumber"></span>
+            <div class="gameMenuStatusBar" id="IngameBar" style="width: 0;"></div>
+        </div>
+
+        <div class="compMenuStatusWrap Intro">
+            <span class="compMenuStatusLabel">Intro</span>
+            <span class="compMenuStatusInfo" id="IntroPercent"></span>
+            <span class="gameMenuStatusAmount" id="IntroNumber"></span>
+            <div class="gameMenuStatusBar" id="IntroBar" style="width: 0;"></div>
+        </div>
+
+        <div class="compMenuStatusWrap Boots">
+            <span class="compMenuStatusLabel">Boots</span>
+            <span class="compMenuStatusInfo" id="BootsPercent"></span>
+            <span class="gameMenuStatusAmount" id="BootsNumber"></span>
+            <div class="gameMenuStatusBar" id="BootsBar" style="width: 0;"></div>
+        </div>
+
+        <div class="compMenuStatusWrap Nothing">
+            <span class="compMenuStatusLabel">Nothing</span>
+            <span class="compMenuStatusInfo" id="NothingPercent"></span>
+            <span class="gameMenuStatusAmount" id="NothingNumber"></span>
+            <div class="gameMenuStatusBar" id="NothingBar" style="width: 0;"></div>
+        </div>
+
+        <label>
+            <input autocomplete="off" type="text" name="obliteration" class="gameMenuSearchBar" placeholder="GAME TITLE / ID" id="search">
+        </label>
+    </div>
+
+    <div id="CardsContainer">
+<!--        <div class="gameCardS Playable">-->
+<!--            <img class="gameCardImage" alt="lmao idfk" src="https://fpps4.net/_images/CUSA/CUSA00207.avif">-->
+<!--            <div class="gameContent">-->
+<!--                <p class="gameCardTitle">Bloodborne</p>-->
+<!--                <p class="gameCardCode">CUSA00207</p>-->
+<!--                <p class="gameCardTag">Playable</p>-->
+<!--                <p class="gameCardUpdated">24/12/2023</p>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div class="gameCard InGame">-->
+<!--            <img class="gameCardImage" alt="lmao idfk" src="https://fpps4.net/_images/CUSA/CUSA04196.avif">-->
+<!--            <div class="gameContent">-->
+<!--                <p class="gameCardTitle">Rain World</p>-->
+<!--                <p class="gameCardCode">CUSA04196</p>-->
+<!--                <p class="gameCardTag">InGame</p>-->
+<!--                <p class="gameCardUpdated">10/02/2024</p>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div class="gameCard Intro">-->
+<!--            <img class="gameCardImage" alt="lmao idfk" src="https://fpps4.net/_images/CUSA/CUSA00040.avif">-->
+<!--            <div class="gameContent">-->
+<!--                <p class="gameCardTitle">Sound Shapes</p>-->
+<!--                <p class="gameCardCode">CUSA00040</p>-->
+<!--                <p class="gameCardTag">Intro</p>-->
+<!--                <p class="gameCardUpdated">30/03/2024</p>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div class="gameCard Boots">-->
+<!--            <img class="gameCardImage" alt="lmao idfk" src="https://fpps4.net/_images/CUSA/CUSA16596.avif">-->
+<!--            <div class="gameContent">-->
+<!--                <p class="gameCardTitle">Cyberpunk 2077</p>-->
+<!--                <p class="gameCardCode">CUSA16596</p>-->
+<!--                <p class="gameCardTag">Boots</p>-->
+<!--                <p class="gameCardUpdated">19/02/2023</p>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div class="gameCardE Nothing">-->
+<!--            <img class="gameCardImage" alt="lmao idfk" src="https://fpps4.net/_images/CUSA/CUSA02344.avif">-->
+<!--            <div class="gameContent">-->
+<!--                <p class="gameCardTitle">Uncharted: The Nathan Drake Collection</p>-->
+<!--                <p class="gameCardCode">CUSA02344</p>-->
+<!--                <p class="gameCardTag">Nothing</p>-->
+<!--                <p class="gameCardUpdated">13/06/2023</p>-->
+<!--            </div>-->
+<!--        </div>-->
+    </div>
+    <div class="endMenu">
+        <h4 class="endMenuInfoText" id="infoText">0 results in 0ms</h4>
+        <h4>page selector here :3</h4>
+    </div>
+</main>
+</body>
+<script defer src="/required.js"></script>
+<script src="./app.js"></script>
+</html>

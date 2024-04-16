@@ -1,0 +1,208 @@
+/* scrollbar */
+::-webkit-scrollbar {
+    width: 0.57rem; }
+  
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.10);
+    border-radius: 0.13rem; }
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.15); }
+
+
+:root {
+    --text: #eceff4;
+    --border: #e1e1e10d;
+    --solidBorder: #393b3e;
+    --background: #121212;
+    --background-themed: #aa3e41;
+    --main1: #b64045;
+    --main2: #c44647;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'inter', sans-serif;
+    scrollbar-color: var(--main1) #ffffff00; /* - FF scrollbar */
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 400;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    font-size: 16;
+}
+
+body {
+    background-color: var(--background);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.header {
+    width: 100vw;
+    height: 55px;
+    display: flex;
+    z-index: 5;
+    position: fixed;
+    background-color: rgba(255, 255, 255, 0.11);
+    backdrop-filter: blur(10px);
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid white;
+    transition: box-shadow 0.3s ease;
+}
+
+.headerIcon {
+    padding: 0 0 0 3.13rem;
+}
+
+
+.headerRight {
+    display: flex;
+    gap: 28px;
+    padding: 0 3.13rem 0 0;
+    align-items: center;
+}
+
+
+.headerRightIcons {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 15px;
+    align-items: center;
+    transition: color 0.2s ease;
+}
+
+.headerRightIconGithub {
+    padding: 7px;
+    transition: background 0.3s ease;
+    border-radius: 10px;
+    height: 25px;
+    width: 25px;
+}
+
+.headerRightIconDiscord {
+    padding: 5px;
+    transition: background 0.3s ease;
+    border-radius: 10px;
+    height: 30px;
+    width: 30px;
+}
+
+.headerRightIcons img:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+.main {
+    position: relative;
+    overflow-x: hidden;
+    overflow: hidden;
+    background-color: var(--background-themed);
+    width: 100%;
+    height: 100vh;
+}
+  
+.mainBackground {
+    position: absolute;
+    top: 0;
+    transform: rotate(80deg);
+    right: 0;
+}
+
+
+.mainBackground1, .mainBackground2 {
+    transition: margin 0.5s ease;
+    width: 160em;
+    height: 140rem;
+    margin-left: 22rem;
+    margin-top: -16rem;
+    transform-origin: 50% 48%;
+    border-radius: 43%;
+    position: fixed;
+    top: 3%;
+    left: 10%;
+}
+
+.mainBackground1 {
+    animation: rotate1 21000ms infinite linear;
+    background: var(--main1);
+}
+
+.mainBackground2 {
+    animation: rotate2 21000ms infinite linear;
+    background: var(--main2);
+}
+  
+@keyframes rotate1 {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(360deg);}
+}
+
+@keyframes rotate2 {
+    from {transform: rotate(30deg);}
+    to {transform: rotate(390deg);}
+}
+
+
+.mainContent {
+    position: relative;
+    top: 20%;
+    left: 3.2rem;
+    transition: left 0.3s ease;
+}
+
+.mainContentBig {
+    font-size: 2.63rem;
+    font-weight: 800;
+}
+
+.mainContentSmoll {
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.mainContentText1 {
+    position: relative;
+    top: 30px;
+}
+
+.mainContentText2 {
+    position: relative;
+    top: 120px;
+}
+
+.mainContentText3 {
+    position: relative;
+    top: 130px;
+}
+
+@media screen and (max-width: 1100px) {
+    .mainContentText1 {
+        width: 42rem;
+    }
+    .mainBackground1, .mainBackground2 {
+        margin-left: 32rem;
+    }
+}
+
+@media screen and (max-width: 750px) {
+    .mainContent {
+        left: 1rem;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .mainBackground1, .mainBackground2 {
+        margin-left: 50rem;
+    }
+}
