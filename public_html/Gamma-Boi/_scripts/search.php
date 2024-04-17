@@ -24,8 +24,6 @@ if ($page < 0 || $page === 0) {
     $page = 1;
 }
 
-//SELECT * FROM issues WHERE code LIKE :searchQuery ORDER BY id DESC LIMIT :offset, :limit
-
 /// defining stuff
 $maxResults = (!empty($searchQuery)) ? 10 : 20;
 $pageNumber = ($page - 1) * $maxResults;

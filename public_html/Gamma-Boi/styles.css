@@ -9,7 +9,6 @@ body {
 
 .main {
     position: relative;
-    /*overflow-x: hidden;*/
     overflow: hidden;
     background-color: var(--background-themed);
     width: 100%;
@@ -51,15 +50,23 @@ body {
     animation: rotate2 21000ms infinite linear;
     background: var(--main2);
 }
-  
+
 @keyframes rotate1 {
-    from {transform: rotate(0deg);}
-    to {transform: rotate(360deg);}
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes rotate2 {
-    from {transform: rotate(30deg);}
-    to {transform: rotate(390deg);}
+    from {
+        transform: rotate(30deg);
+    }
+    to {
+        transform: rotate(390deg);
+    }
 }
 
 
@@ -197,6 +204,7 @@ body {
     .mainText2 {
         width: 42rem;
     }
+
     .mainBackground1, .mainBackground2 {
         margin-left: 32rem;
     }
@@ -204,7 +212,7 @@ body {
 
 /* top menu switch */
 @media screen and (max-width: 780px) {
-    .mainContent, .main2Content  {
+    .mainContent, .main2Content {
         margin-left: 1rem;
     }
 }
@@ -223,10 +231,11 @@ body {
     }
 }
 
-@media (min-height: 700px) and (max-width: 550px)  {
+@media (min-height: 700px) and (max-width: 550px) {
     .main {
         height: 90vh;
     }
+
     .main2 {
         height: 80vh;
     }
@@ -244,14 +253,15 @@ body {
     .main, .main2 {
         min-height: 0;
     }
+
     .mainBackground {
         margin-top: 0;
     }
 }
 
 /* is this really needed? */
-@media (max-height: 520px) and (max-width: 460px){
-    .main, .main2  {
+@media (max-height: 520px) and (max-width: 460px) {
+    .main, .main2 {
         min-height: 500px;
     }
 }

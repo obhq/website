@@ -1,56 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Obliteration</title>
-        <meta name="description" content="Obliteration is an experimental open-source PS4 emulator written inmade for Windows, MacOS, and Linux.">
-        <meta name="keywords" content="Obliteration, playstation, ps4, playstation 4, emulator, windows, macOS, linux, open-source, rust, C++, obliteration github, obliteration discord, obliteration wiki">
-        <meta name="robots" content="index,follow">
-        <meta name="author" content="Obliteration">
-        <meta name="copyright" content="Obliteration">
-        <meta name="theme-color" content="#680600">
-        <meta name="twitter:card" content="summary_large_image"/> 
-        <meta name="twitter:title" content="Obliteration - An experimental open-source PS4 emulator"/> 
-        <meta name="twitter:description" content="Obliteration is an experimental open-source PS4 emulator written in Rust for Windows, macOS and Linux."/> 
-        <meta name="twitter:image:src" content="https://obliteration.net/_images/Obliteration.png"/>
-        <meta property="og:title" content="Obliteration - An experimental open-source PS4 emulator">
-        <meta property="og:description" content="Obliteration is an experimental open-source PS4 emulator written in Rust for Windows, macOS and Linux.">
-        <meta property="og:image" content="https://obliteration.net/_images/Obliteration-smoll.png">
-        <meta property="og:url" content="https://obliteration.net">
-        <link rel="icon" href="https://obliteration.net/_images/Obliteration-smoll.png" type="image/png">
-        <link rel="preconnect" href="https://rsms.me/">
-        <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
-        <link rel="stylesheet" href="/_errorPages/errstyles.css">
-        <meta name="darkreader-lock"> <!-- for disabling dark mode with dark reader -->
-    </head>
-    <body>
-        <header class="header">
-            <a class="headerIcon" href="/">
-                <image id="headerIcon" src="/_images/Obliteration.png" height="40"/>
-            </a>
-            <div class="headerRight">
-                <div class="headerRightIcons">
-                    <a href="https://github.com/obhq/obliteration" target="_blank">
-                        <image class="headerRightIconGithub" src="/_images/github.svg"/>
-                    </a>
-                    <a href="https://discord.gg/Qsdaxj6tnH" target="_blank">
-                        <image class="headerRightIconDiscord" src="/_images/discord.svg"/>
-                    </a>
-                </div>
-            </div>
-        </header>
-        <main class="main">
-            <div class="mainBackground">
-                <div class="mainBackground1"></div>
-                <div class="mainBackground2"></div>
-            </div>
-            <div class="mainContent">
-                <p class="mainContentBig mainContentText1">Unimplemented Syscall: <span class="mainContentBig" style="color: #11045c; text-shadow: 2px 2px 1px #4042b6;">500</span>!</p>
-                <p class="mainContentSmoll mainContentText2">Seems like the server encountered an issue! <br>Maybe <a class="mainContentSmoll" style="color: #11045c; text-shadow: 2px 2px 1px #4042b6;" href="javascript:location.reload()">retry?</a></p>
-            </div>
-        </main>
-    </body>
-    <script src="/_errorPages/errapp.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Obliteration - 500</title>
+    <meta name="description" content="Obliteration is an experimental open-source PS4 emulator written inmade for Windows, MacOS, and Linux.">
+    <meta name="keywords" content="Obliteration, playstation, ps4, playstation 4, emulator, windows, macOS, linux, open-source, rust, C++, obliteration github, obliteration discord, obliteration wiki">
+    <meta name="robots" content="index,follow">
+    <meta name="author" content="Obliteration">
+    <meta name="copyright" content="Obliteration">
+    <meta name="theme-color" content="#680600">
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Obliteration - An experimental open-source PS4 emulator"/>
+    <meta name="twitter:description" content="Obliteration is an experimental open-source PS4 emulator written in Rust for Windows, macOS and Linux."/>
+    <meta name="twitter:image:src" content="https://obliteration.net/_images/Obliteration.png"/>
+    <meta property="og:title" content="Obliteration - An experimental open-source PS4 emulator">
+    <meta property="og:description" content="Obliteration is an experimental open-source PS4 emulator written in Rust for Windows, macOS and Linux.">
+    <meta property="og:image" content="/_images/Obliteration-smoll.png">
+    <meta property="og:url" content="https://obliteration.net">
+    <link rel="icon" href="/_images/Obliteration-smoll.png" type="image/png">
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <link rel="stylesheet" href="/required.css">
+    <link rel="stylesheet" href="/_errorPages/errstyles.css">
+    <meta name="darkreader-lock"> <!-- for disabling dark mode with dark reader -->
+</head>
+<body>
+<header class="header" id="header"></header>
+<div class="menuContainer" id="menu"></div>
+
+<main class="main">
+    <div class="mainBackground">
+        <div class="mainBackground1"></div>
+        <div class="mainBackground2"></div>
+    </div>
+    <div class="mainContent">
+        <p class="mainContentBig mainContentText1">Unimplemented Syscall:
+            <span class="mainContentBig text-themed-err">500</span>!</p>
+        <p class="mainContentSmoll mainContentText2">Seems like the server encountered an issue! <br>Maybe
+            <a class="mainContentSmoll text-themed-err" href="javascript:location.reload()">try again?</a>
+        </p>
+    </div>
+</main>
+</body>
+<script defer src="/required.js"></script>
+<script src="/_errorPages/errapp.js"></script>
 </html>
