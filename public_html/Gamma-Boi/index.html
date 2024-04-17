@@ -38,28 +38,22 @@
     </div>
     <div class="mainContent">
         <p class="bigText mainText1">Welcome to
-            <span class="bigText" style="color: #5c0504; text-shadow: 2px 2px 1px #b64045;">Obliteration  - WIP</span>
+            <span class="bigText text-themed">Obliteration</span>
         </p>
         <p class="smollText mainText2">An Experimental
-            <span class="smollText" style="color: #5c0504; text-shadow: 2px 2px 1px #b64045;">Playstation™ 4</span> emulator written in Rust for Windows, macOS and Linux!
+            <span class="smollText text-themed">Playstation™ 4</span> emulator written in Rust for Windows, macOS and Linux!
         </p>
         <table class="mainTable">
             <tr>
-                <?php
-                $stats = json_decode(file_get_contents("G:\OBHQdb\stats\stats.json"), true);
-                if ($stats) {
-                    $stars = $stats["stars"];
-                    $issues = $stats["issues"];
-                    $devbuilds = $stats["devbuilds"];
-                    echo "<td><p class='midText' style='color: #5c0504; text-shadow: 2px 2px 1px #b64045;'>$stars</p></td>";
-                    echo "<td><p class='midText' style='color: #5c0504; text-shadow: 2px 2px 1px #b64045;'>$issues</p></td>";
-                    echo "<td><p class='midText' style='color: #5c0504; text-shadow: 2px 2px 1px #b64045;'>$devbuilds</p></td>";
-                } else {
-                    echo "<td><p class='midText' style='color: #5c0504; text-shadow: 2px 2px 1px #b64045;'>N/A</p></td>";
-                    echo "<td><p class='midText' style='color: #5c0504; text-shadow: 2px 2px 1px #b64045;'>N/A</p></td>";
-                    echo "<td><p class='midText' style='color: #5c0504; text-shadow: 2px 2px 1px #b64045;'>N/A</p></td>";
-                }
-                ?>
+                <td>
+                    <p class="midText tableNumber" id="stars" style="color: #5c0504; text-shadow: 2px 2px 1px #b64045;"></p>
+                </td>
+                <td>
+                    <p class="midText tableNumber" id="issues" style="color: #5c0504; text-shadow: 2px 2px 1px #b64045;"></p>
+                </td>
+                <td>
+                    <p class="midText tableNumber" id="devbuilds" style="color: #5c0504; text-shadow: 2px 2px 1px #b64045;"></p>
+                </td>
             </tr>
             <tr>
                 <td><p class="smollText">Stars on GitHub!</p></td>

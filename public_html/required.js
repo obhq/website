@@ -76,6 +76,25 @@ function offMenu() {
     menuButton();
 }
 
+function animationHandler() {
+    const observer = new IntersectionObserver(toAnimate, {threshold: 0.5});
+
+    document.querySelectorAll('.toAnimate').forEach(element => {
+        observer.observe(element);
+    });
+
+    function toAnimate(entries, observer) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.remove("toAnimate");
+                observer.unobserve(entry.target);
+
+                entry.target.classList.add("animate");
+            }
+        });
+    }
+}
+
 
 function init() {
     let header_html = `
