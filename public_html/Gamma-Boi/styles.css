@@ -149,7 +149,7 @@ body {
     height: 90vh;
 }
 
-.tableNumber {
+.mainTableNumber {
     position: relative;
     display: flex;
     overflow: hidden;
@@ -160,7 +160,7 @@ body {
 }
 
 
-.tableNumber > #silly {
+.mainTableNumber > .tableNumbersContainer {
     display: flex;
     flex-direction: column;
     position: static;

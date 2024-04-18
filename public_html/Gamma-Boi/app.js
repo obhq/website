@@ -8,9 +8,9 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener("scroll", headerUpdate);
 
     fetch('/stats.json').then(response => response.json()).then(jsonData => {
-        countingAnimation(jsonData.stars, document.getElementById("stars"));
-        countingAnimation(jsonData.issues, document.getElementById("issues"));
-        countingAnimation(jsonData.devbuilds, document.getElementById("devbuilds"));
+        countingAnimation(jsonData.stars, document.getElementById("starsNumber"));
+        countingAnimation(jsonData.issues, document.getElementById("issuesNumber"));
+        countingAnimation(jsonData.devbuilds, document.getElementById("devbuildsNumber"));
     })
 });
 
@@ -22,25 +22,19 @@ function buttonScroll() {
 
 function countingAnimation(number, element) {
     const digits = number.toString().split("");
-    var first = true;
 
     digits.forEach(digit => {
         let spanList = '';
 
         for (let i = 0; i < 10; i++) {
-            spanList += `<span class=" midText text-themed">${i}</span>`;
+            spanList += `<span class="midText text-themed">${i}</span>`;
         }
-
-        if (first) {
-            first = false;
-            element.innerHTML = `<span style="transform: translateY(-1000%)" id="silly">${spanList}`;
-        } else {
-            element.innerHTML += `<span style="transform: translateY(-1000%)" id="silly">${spanList}`;
-        }
+        
+        element.innerHTML += `<span class="tableNumbersContainer" style="transform: translateY(-1000%)">${spanList}`;
     });
 
     setTimeout(() => {
-        element.querySelectorAll('#silly').forEach((e, i) => {
+        element.querySelectorAll('.tableNumbersContainer').forEach((e, i) => {
             e.style.transform = `translateY(-${100 * parseInt(digits[i])}%)`;
         });
     }, 100)
