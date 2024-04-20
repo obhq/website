@@ -1,0 +1,200 @@
+/*scrollbar*/
+::-webkit-scrollbar {
+    width: 0.57rem;
+    overflow: visible;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.10);
+    border-radius: 0.13rem;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+
+:root {
+    --text: #eceff4;
+    --text2: #dee1e7;
+    --border: #e1e1e10d;
+    --solidBorder: #393b3e;
+    --background: #1e1e1e;
+    --background-themed: #aa3e41;
+    --background-themed-err: #403eaa;
+    --main1: #b64045;
+    --main1-err: #4240b6;
+    --main2: #c44647;
+    --main2-err: #4663c4;
+}
+
+.text-themed {
+    color: #5c0504;
+    text-shadow: 2px 2px 1px #b64045;
+}
+
+.text-themed-err {
+    color: #11045c;
+    text-shadow: 2px 2px 1px #4042b6;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'inter', sans-serif;
+    scrollbar-color: var(--main1) #ffffff00; /* - FF scrollbar */
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 400;
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    overflow-y: scroll; /* maybwe? mostly for consistency*/
+}
+
+.header {
+    width: 100vw;
+    height: 55px;
+    display: flex;
+    z-index: 5;
+    position: fixed;
+    background-color: rgb(179, 82, 87, 0.8);
+    backdrop-filter: blur(8px);
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: box-shadow 0.3s ease;
+    user-select: none;
+}
+
+.headerIcon {
+    margin-left: 3.13rem;
+}
+
+
+.headerRight {
+    display: flex;
+    gap: 28px;
+    margin-right: 3.13rem;
+    align-items: center;
+}
+
+.headerLink {
+    align-self: center;
+    transition: color 0.3s ease, background-color 0.2s ease;
+    border-radius: 10px;
+    padding: 6px 8px;
+}
+
+.headerLink text {
+    transition: color 1s ease;
+}
+
+.headerLink:hover {
+    color: #5c0504;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.headerRightIcons {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 15px;
+    align-items: center;
+    transition: color 0.2s ease;
+}
+
+.headerRightIcons img:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.headerRightIconGithub, .headerRightIconDiscord, .headerRightIconMenu {
+    transition: background 0.3s ease;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.headerRightIconMenu {
+    width: 39px;
+    height: 39px;
+    display: none;
+}
+
+.headerRightIconGithub {
+    padding: 7px;
+    height: 40px;
+    width: 40px;
+}
+
+.headerRightIconDiscord {
+    padding: 5px;
+    height: 40px;
+    width: 40px;
+}
+
+.menuContainer {
+    z-index: 6;
+    display: none;
+    position: fixed;
+    right: 0;
+    margin: 65px 0 0 0;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.2s ease;
+}
+
+.menu {
+    display: flex;
+    position: fixed;
+    z-index: 8;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 144px;
+    height: 122px;
+    right: 0;
+    background-color: rgba(126, 44, 46, 0.6);
+    backdrop-filter: blur(10px);
+    border-radius: 0.4rem 0 0 0.4rem;
+    gap: 15px;
+    padding-right: 3.13rem;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 2px 5px;
+}
+
+.menuLink {
+    position: relative;
+    margin-left: 10px;
+    top: 10px; /* might need to change this to margin? */
+    font-size: 20px;
+}
+
+/* top menu switch */
+@media screen and (max-width: 780px) {
+    .headerLink {
+        display: none;
+    }
+
+    .headerRightIconMenu {
+        display: block;
+    }
+}
+
+/* most phones... i think? (hope) */
+@media (min-height: 520px) and (max-width: 460px) {
+    .headerRightIcons {
+        gap: 10px;
+    }
+
+    .headerIcon {
+        margin-left: 1rem;
+    }
+
+    .headerRight {
+        margin-right: 1rem;
+    }
+}
