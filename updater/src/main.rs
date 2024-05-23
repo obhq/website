@@ -4,62 +4,43 @@ use std::path::Path;
 use std::time::Instant;
 
 use chrono::{DateTime, prelude::*, Timelike, Utc};
-use hex::{encode, FromHex};
+use hex::encode;
 use md5::{Digest, Md5};
 use regex::Regex;
-use rusqlite::{Connection, params};
+use rusqlite::Connection;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-mod r#extern;
+use crate::config::{AppConfig, get_config};
 
-struct Issue<'lt> {
+mod utils;
+mod config;
+
+#[derive(Serialize, Deserialize)]
+struct Issue {
     id: u64,
     code: String,
     title: String,
-    tag: &'lt str,
-    issue_type: &'lt str,
-    last_updated: String,
-    image_exists: bool,
+    tag: String,
+    r#type: String,
+    updated: String,
+    image: bool,
 }
 
 fn main() {
-    println!("1/3 : Reading config :3");
-    let mut issues: Vec<Issue> = Vec::new();
-
+    println!("1/4 : Reading config :3");
     let start_time = Instant::now();
     let minute: u32 = Utc::now().minute();
 
     let mut skipped_images: u64 = 0;
     let code_regex = Regex::new(r"[a-zA-Z]{4}[0-9]{5}").unwrap();
 
-    let config_data: r#extern::Config = r#extern::config_creator();
-
-    let api_url: &str = config_data.keys.compat_github_url.as_str();
-    let github_url: &str = config_data.keys.github_url.as_str();
-    let api_token: &str = config_data.keys.github_token.as_str();
-    let hb_user_agent: &str = config_data.keys.homebrew_token.as_str();
-    let game_user_agent: &str = config_data.keys.ps4_useragent.as_str();
-    let tmdb_hash_bytes: Vec<u8> = Vec::from_hex(config_data.keys.tmdb_hash).expect("Invalid tmdb hash!");
-    let workflow_url: &str = config_data.keys.workflow_url.as_str();
-
-    let images_games_folder: &str = config_data.locations.games_folder.as_str();
-    let images_hb_folder: &str = config_data.locations.homebrew_folder.as_str();
-    let hb_db_path: &str = config_data.locations.homebrew_database.as_str();
-    let db_path: &str = config_data.locations.database.as_str();
-    let stats_folder: &str = config_data.locations.stats_folder.as_str();
-
-    let tag_homebrew: u64 = config_data.ids.homebrew;
-    let tag_playable: u64 = config_data.ids.playable;
-    let tag_ingame: u64 = config_data.ids.ingame;
-    let tag_intro: u64 = config_data.ids.intro;
-    let tag_boots: u64 = config_data.ids.boots;
-    let tag_nothing: u64 = config_data.ids.nothing;
-
+    let config: AppConfig = get_config();
 
     // Checks if homebrew database is up-to-date
-    if !(4..=57).contains(&minute) || !Path::new(hb_db_path).exists() {
+    if !(4..=57).contains(&minute) || !Path::new(&config.homebrew_database).exists() {
         match ureq::get("https://api.pkg-zone.com/api.php?db_check_hash=true")
-            .set("User-Agent", hb_user_agent)
+            .set("User-Agent", &config.homebrew_token)
             .call()
         {
             Ok(response) => {
@@ -73,7 +54,7 @@ fn main() {
                 };
 
                 // this also checks if the file exists, if it doesn't the hash will not match and the database will be downloaded :3!
-                let local_hash: String = match fs::read(hb_db_path) {
+                let local_hash: String = match fs::read(&config.homebrew_database) {
                     Ok(file) => encode(Md5::digest(file)),
                     Err(err) => {
                         println!("Database not found: {}", err);
@@ -92,15 +73,15 @@ fn main() {
 
                     // Downloads the new database
                     match ureq::get("https://api.pkg-zone.com/store.db")
-                        .set("User-Agent", hb_user_agent)
+                        .set("User-Agent", &config.homebrew_token)
                         .call()
                     {
                         Ok(response) => {
-                            let mut file = File::create(hb_db_path).expect("failed to create file");
+                            let mut file = File::create(&config.homebrew_database).expect("failed to create file");
 
                             match std::io::copy(&mut response.into_reader(), &mut file) {
                                 Ok(_) => {
-                                    println!("Saved database in: '{}' Successfully!", hb_db_path)
+                                    println!("Saved database in: \"{}\" Successfully!", &config.homebrew_database)
                                 }
                                 Err(err) => {
                                     panic!("Aborting, error saving homebrew database: {}", err)
@@ -108,7 +89,7 @@ fn main() {
                             };
                         }
                         Err(err) => {
-                            if !Path::new(hb_db_path).exists() {
+                            if !Path::new(&config.homebrew_database).exists() {
                                 panic!("Error downloading database and couldn't find the file locally.");
                             }
                             eprintln!("Request failed: {}", err);
@@ -117,7 +98,7 @@ fn main() {
                 }
             }
             Err(err) => {
-                if !Path::new(hb_db_path).exists() {
+                if !Path::new(&config.homebrew_database).exists() {
                     panic!("Error getting database hash and couldn't find the file locally.");
                 }
                 eprintln!("Request failed: {}", err);
@@ -125,33 +106,38 @@ fn main() {
         }
     }
 
-    println!("2/3 : Starting Database Update :3");
-    // Setup database connections and make sql tables
-    let database_hb = Connection::open(hb_db_path).expect("Failed to open SQLite connection");
-    let mut database = Connection::open(db_path).expect("Failed to open SQLite connection");
+    println!("2/4 : Initializing Databases :3");
 
-    {
-        let statements = "
-            CREATE TABLE IF NOT EXISTS issues (
-              id INT(6) PRIMARY KEY,
-              code VARCHAR(10),
-              title VARCHAR(130),
-              tag VARCHAR(20),
-              type VARCHAR(6),
-              updatedDate VARCHAR(12),
-              image boolean DEFAULT 0
-            );
-            CREATE TABLE IF NOT EXISTS gameSkips (
-              id INT(6) PRIMARY KEY
-            );";
+    // Setup databases
+    let database_hb = Connection::open(&config.homebrew_database).expect("Failed to open SQLite connection");
 
-        database
-            .execute_batch(statements)
-            .expect("Failed to create database tables!");
-    }
+    let mut new_issues: Vec<Issue> = Vec::new();
+
+    let old_issues: Vec<Issue> = {
+        let json_string: String = fs::read_to_string("./database.json").unwrap_or_default();
+
+        serde_json::from_str(&json_string).unwrap_or_default()
+    };
+
+
+    let mut game_skips: Vec<u64> = {
+        let file = Path::new("./game_skips.json");
+
+        if file.exists() {
+            let json_string = fs::read_to_string("./game_skips.json").unwrap_or_default();
+
+            serde_json::from_str(&json_string).unwrap_or_default()
+        } else {
+            Vec::new()
+        }
+    };
+
+    // println!("{:?}", &old_issues);
+
+    println!("3/4 : Starting Database Update :3");
 
     let page_count: u64 = {
-        let total_issues: u64 = github_request(api_url, api_token)
+        let total_issues: u64 = github_request(&config.api_url, &config.api_token)
             .get("open_issues_count")
             .and_then(Value::as_u64)
             .expect("Failed to parse JSON o.o!");
@@ -168,16 +154,17 @@ fn main() {
         let github_issues = {
             let url = format!(
                 "{}/issues?page={}&per_page=100&state=open&direction=ASC",
-                api_url, page
+                &config.api_url, page
             );
+
             // need to clone otherwise it is a reference *cat crying emoji*
-            github_request(url.as_str(), api_token)
+            github_request(url.as_str(), &config.api_token)
                 .as_array()
                 .cloned()
                 .unwrap()
         };
 
-        let page_time = Instant::now();
+        // let page_time = Instant::now();
 
         for issue in github_issues {
             // let issue_time = Instant::now();
@@ -229,11 +216,11 @@ fn main() {
                 };
 
                 match &tags {
-                    x if x.contains(&tag_playable) => tag = "Playable",
-                    x if x.contains(&tag_ingame) => tag = "Ingame",
-                    x if x.contains(&tag_intro) => tag = "Intro",
-                    x if x.contains(&tag_boots) => tag = "Boots",
-                    x if x.contains(&tag_nothing) => tag = "Nothing",
+                    x if x.contains(&config.tag_playable) => tag = "Playable",
+                    x if x.contains(&config.tag_ingame) => tag = "Ingame",
+                    x if x.contains(&config.tag_intro) => tag = "Intro",
+                    x if x.contains(&config.tag_boots) => tag = "Boots",
+                    x if x.contains(&config.tag_nothing) => tag = "Nothing",
                     _ => tag = "N/A",
                 }
 
@@ -256,7 +243,7 @@ fn main() {
                     x if x.starts_with("PCJS") => issue_type = "GAME",
                     x if x.starts_with("PLJM") => issue_type = "GAME",
                     x if x.starts_with("PLJS") => issue_type = "GAME",
-                    _x if tags.contains(&tag_homebrew) => {
+                    _x if tags.contains(&config.tag_homebrew) => {
                         issue_type = "HB";
                         if temp_code.is_empty() {
                             temp_code = "HomeBrew".to_string()
@@ -270,48 +257,54 @@ fn main() {
                 code = temp_code
             }
 
-            let game_path = format!("{}{}.avif", images_games_folder, &code);
-            let hb_path = format!("{}{}.avif", images_hb_folder, &title);
+            let game_path = format!("{}{}.avif", &config.games_folder, &code);
+            let hb_path = format!("{}{}.avif", &config.homebrew_folder, &title);
             let mut image_exists: bool = false;
 
             // CHECK IF THE GAME IS ALREADY SAVED, IF NOT PROCEED
             if issue_type == "GAME" && !Path::new(&game_path).exists() {
-                let mut stmt = database
-                    .prepare("SELECT * FROM gameSkips WHERE id = (?1) COLLATE NOCASE")
-                    .expect("Database query failed!");
+                // todo
+                // let mut stmt = database
+                //     .prepare("SELECT * FROM gameSkips WHERE id = (?1) COLLATE NOCASE")
+                //     .expect("Database query failed!");
 
                 // CHECK IF THE ID IS IN THE SKIP TABLE
-                if !stmt.exists(params![&id]).expect("Database query failed!") {
-                    match r#extern::image_handler(r#extern::ImageTypes::Game(
-                        game_user_agent,
+                // if !stmt.exists(params![&id]).expect("Database query failed!") {
+                if game_skips.contains(&id) {
+                    match utils::image_handler(utils::ImageTypes::Game(
+                        &config.ps4_useragent,
                         game_path,
                         &code,
-                        &tmdb_hash_bytes,
+                        &config.tmdb_hash,
                     )) {
                         Ok(_) => image_exists = true,
                         Err(err) => {
                             eprintln!("Image download failed! {}", err);
                             skipped_images += 1;
-                            let mut stmt = database
-                                .prepare("INSERT INTO gameSkips (id) VALUES (?)")
-                                .expect("Database query failed!");
+                            // let mut stmt = database
+                            //     .prepare("INSERT INTO gameSkips (id) VALUES (?)")
+                            //     .expect("Database query failed!");
 
-                            stmt.execute([id])
-                                .expect("error executing database insert for gameSkips");
+
+                            // stmt.execute([id])
+                            //     .expect("error executing database insert for gameSkips");
+
+                            game_skips.push(id);
                         }
                     }
                 } else {
                     skipped_images += 1;
                 }
             } else if issue_type == "HB" && !Path::new(&hb_path).exists() {
-                let mut stmt = database
-                    .prepare("SELECT * FROM gameSkips WHERE id = (?1) COLLATE NOCASE")
-                    .expect("Database query failed!");
+                // let mut stmt = database
+                //     .prepare("SELECT * FROM gameSkips WHERE id = (?1) COLLATE NOCASE")
+                //     .expect("Database query failed!");
 
                 // CHECK IF THE ID IS IN THE SKIP TABLE
-                if !stmt.exists(params![&id]).expect("Database query failed!") {
-                    match r#extern::image_handler(r#extern::ImageTypes::Hb(
-                        hb_user_agent,
+                // if !stmt.exists(params![&id]).expect("Database query failed!") {
+                if game_skips.contains(&id) {
+                    match utils::image_handler(utils::ImageTypes::Hb(
+                        &config.homebrew_token,
                         hb_path,
                         &database_hb,
                         &title,
@@ -320,12 +313,8 @@ fn main() {
                         Err(err) => {
                             eprintln!("Image download failed! {}", err);
                             skipped_images += 1;
-                            let mut stmt = database
-                                .prepare("INSERT INTO gameSkips (id) VALUES (?)")
-                                .expect("Database query failed!");
 
-                            stmt.execute([id])
-                                .expect("error executing database insert for gameSkips");
+                            game_skips.push(id);
                         }
                     }
                 } else {
@@ -340,65 +329,69 @@ fn main() {
             //     "{} : {} [{}] - {}, {}   {}",
             //     &id, &title, &code, &issue_type, &tag, &last_updated
             // );
-            issues.push(Issue {
+            new_issues.push(Issue {
                 id,
                 code,
                 title,
-                tag,
-                issue_type,
-                last_updated,
-                image_exists,
+                tag: tag.to_string(),
+                r#type: issue_type.to_string(),
+                updated: last_updated,
+                image: image_exists,
             });
             // println!("Title in: {}μs", (Instant::now() - issue_time).as_micros());
         }
-        println!(
-            "Page {} in: {}ms",
-            page,
-            (Instant::now() - page_time).as_millis()
-        );
+        // println!(
+        //     "Page {} in: {}ms",
+        //     page,
+        //     (Instant::now() - page_time).as_millis()
+        // );
     }
 
     println!("3/3 : Starting Database transfer :3");
 
     // put issues into database
-    let new_issues_count: f64 = issues.len() as f64;
+    let new_issues_count: f64 = new_issues.len() as f64;
 
-    let old_issues_count: f64 = database
-        .query_row("SELECT COUNT(*) FROM issues", [], |row| row.get(0))
-        .expect("error getting the old issues count");
+
+    // todo get current issues.json
+    let old_issues_count: f64 = old_issues.len() as f64;
 
     // remove 5% from old issue count
     if new_issues_count > (0.95 * old_issues_count) {
-        database
-            .execute("DELETE FROM issues", ())
-            .expect("Error while moving database!");
+        let issues_json = serde_json::to_string(&new_issues).expect("Uh oh! Error creating the json string!");
+        fs::write(format!("./database.json"), issues_json).expect("Error creating Json!");
 
-        let transaction = database.transaction().unwrap();
-        {
-            let mut stmt = transaction
-                .prepare("INSERT or IGNORE INTO issues (id, code, title, tag, type, updatedDate, image) VALUES (?, ?, ?, ?, ?, ?, ?)")
-                .expect("Database query failed!");
 
-            for issue in issues {
-                stmt.execute(params![
-                    issue.id,
-                    issue.code,
-                    issue.title,
-                    issue.tag,
-                    issue.issue_type,
-                    issue.last_updated,
-                    issue.image_exists,
-                ])
-                    .expect("Database insertion failed!");
-            }
-        }
-        transaction.commit().expect("Database insertion failed!");
+        // database
+        //     .execute("DELETE FROM issues", ())
+        //     .expect("Error while moving database!");
+        //
+        // let transaction = database.transaction().unwrap();
+        // {
+        //     let mut stmt = transaction
+        //         .prepare("INSERT or IGNORE INTO issues (id, code, title, tag, type, updatedDate, image) VALUES (?, ?, ?, ?, ?, ?, ?)")
+        //         .expect("Database query failed!");
+        //
+        //     for issue in issues {
+        //         stmt.execute(params![
+        //             issue.id,
+        //             issue.code,
+        //             issue.title,
+        //             issue.tag,
+        //             issue.issue_type,
+        //             issue.last_updated,
+        //             issue.image_exists,
+        //         ])
+        //             .expect("Database insertion failed!");
+        //     }
+        // }
+        // transaction.commit().expect("Database insertion failed!");
     } else {
         eprintln!("Something is wrong with newIssues, skipping update.");
     }
 
     // create the stats.json
-    match r#extern::stats_creator(stats_folder, api_token, github_url, api_url, workflow_url) {
+    match utils::stats_creator(&config.stats_folder, &config.api_token, &config.github_url, &config.api_url, &config.workflow_url) {
         Ok(_) => (),
         Err(err) => eprintln!("Error creating stats.json! {}", err),
     }

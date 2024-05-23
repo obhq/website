@@ -1,4 +1,4 @@
-let fancyJsonData; // :3
+let databaseJsonData; // :3
 let totalPages;
 let tagFilter = [];
 let oldestFilter = false;
@@ -27,38 +27,83 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener("scroll", headerUpdate);
 
     // + fetch issues and set the tag bars
-    fetch('../_scripts/search.php?q=&stats')  //todo : change
+    fetch('../../../updater/database.json')  //todo : change lmao
         .then(response => response.json())
         .then(jsonData => {
             gameCardHandler(jsonData);
-            fancyJsonData = jsonData;
+            databaseJsonData = jsonData;
             // pageButtonHandler();
 
-            totalPages = jsonData.info.pages;
-            totalTime = jsonData.info.time;
-            totalIssues = jsonData.info.issues;
-            console.log("\nCOMPATIBILITY STATS");
+            totalIssues = jsonData.length;
+            totalPages = totalIssues / 20;
+
 
             // stats & tag filter
-            jsonData.stats.forEach(stat => {
-                var tag = stat.tag;
-                var percent = stat.percent;
+            console.log("\nCOMPATIBILITY STATS");
+
+            let availableTags = ['Nothing', 'Boots', 'Intro', 'Ingame', 'Playable'];
+            let totalPercentage = 0;
+            let naCount = 0;
+
+            let tagPercentages = [];
+            let tagCount = [];
+
+            // get tag count
+            availableTags.forEach(tag => {
+                // init tag count
+                tagCount[tag] = 0;
+
+                jsonData.forEach(issue => {
+                    if (issue.tag === tag) {
+                        tagCount[tag]++;
+
+                    } else if (issue.tag === "N/A") {
+                        naCount++;
+                    }
+                });
+            });
+
+            // get raw tag percentages
+            availableTags.forEach(tag => {
+                let rawPercentage = (tagCount[tag] / (totalIssues - naCount)) * 100;
+
+                tagPercentages[tag] = rawPercentage.toFixed(2);
+                totalPercentage += rawPercentage.toFixed(2);
+            });
+
+            // make percentages correct (mostly ~heh)
+            if (totalPercentage !== 100) {
+                let difference = (100 - totalPercentage) / availableTags.length;
+
+                availableTags.forEach(tag => {
+                    tagPercentages[tag] = parseFloat(tagPercentages[tag] + difference).toFixed(2);
+                });
+            }
+
+
+            availableTags.forEach(tag => {
+                var percent = tagPercentages[tag];
+                var count = tagCount[tag];
+
                 var tagBar = document.getElementById(tag + 'Bar');
                 var tagContainer = tagBar.parentElement;
-                console.log(`${tag} = ${percent}% [${stat.count}]`);
+                console.log(`${tag} = ${percent}% [${count}]`);
 
                 tagBar.style.width = percent + '%';
                 document.getElementById(tag + 'Percent').textContent = percent + '%';
-                document.getElementById(tag + 'Number').textContent = stat.count;
+                document.getElementById(tag + 'Number').textContent = count;
 
                 tagContainer.addEventListener('click', function () {
                     tagContainer.classList.toggle('compStatusSelected');
                     tagFilter.includes(tag) ? tagFilter.splice(tagFilter.indexOf(tag), 1) : tagFilter.push(tag);
+
                     pageNumber = 1;
                     updateSearchResults();
                 });
             });
+
             console.log("\n");
+
         })
         .catch(console.error);
 });
@@ -69,11 +114,12 @@ document.getElementById('search').addEventListener('input', function () {
     updateSearchResults();
 });
 
-async function updateSearchResults() {
+function updateSearchResults() {
     clearTimeout(Timer);
     const cardsContainer = document.getElementById("CardsContainer");
-    const searchQuery = document.getElementById('search').value;
+    const searchQuery = document.getElementById('search').value.toLowerCase();
 
+    // skeleton animation
     cardsContainer.querySelectorAll(".gameCardS, .gameCard, .gameCardE").forEach(container => {
         const skeletonDiv = document.createElement('a');
 
@@ -86,14 +132,31 @@ async function updateSearchResults() {
     });
 
     Timer = setTimeout(() => {
-        fetch('../_scripts/search.php?q=' + searchQuery + '&tag=' + tagFilter + '&page=' + pageNumber + '&oldest=' + oldestFilter)
-            .then(response => response.json())
-            .then(jsonData => {
-                fancyJsonData = jsonData;
-                gameCardHandler(jsonData);
-                // pageButtonHandler("");
-            })
-            .catch(console.error);
+        var jsonData = [];
+
+        databaseJsonData.forEach(game => {
+            if (!game.title.toLowerCase().includes(searchQuery)) {
+                return;
+            }
+
+            if (tagFilter.length > 0) {
+                let isGood = false;
+
+                tagFilter.forEach(tag => {
+                    if (tag === game.tag) {
+                        isGood = true;
+                    }
+                })
+
+                if (isGood === false) {
+                    return;
+                }
+            }
+
+            jsonData.push(game);
+        });
+
+        gameCardHandler(jsonData);
     }, 300);
 }
 
@@ -103,11 +166,11 @@ function gameCardHandler(jsonData) {
     const gameWrapper = document.getElementById("CardsContainer");
     gameWrapper.innerHTML = "";
 
-    let currentNum = 0;
-    let lastNum = Object.keys(jsonData.games).length;
+    let currentIssue = 0;
+    let totalIssues = jsonData.length;
 
-    jsonData.games.forEach(game => {
-        currentNum++;
+    jsonData.forEach(game => {
+        currentIssue++;
         // game image URL
         let imageSource;
         let cardType;
@@ -132,10 +195,13 @@ function gameCardHandler(jsonData) {
         }
 
         switch (true) {
-            case currentNum === 1 :
+            case totalIssues === 1 :
+                cardType = "gameCard";
+                break;
+            case currentIssue === 1 :
                 cardType = "gameCardS";
                 break;
-            case currentNum === lastNum :
+            case currentIssue === totalIssues :
                 cardType = "gameCardE";
                 break;
         }
@@ -148,7 +214,7 @@ function gameCardHandler(jsonData) {
             <p class="gameCardTitle">${game.title}</p>
             <p class="gameCardCode">${game.code}</p>
             <p class="gameCardTag">${game.tag}</p>
-            <p class="gameCardUpdated">${game.upDate}</p>
+            <p class="gameCardUpdated">${game.updated}</p>
         </div>
     </a>`;
         let cardClass = "." + (cardType ? cardType : `gameCard`);
@@ -159,8 +225,5 @@ function gameCardHandler(jsonData) {
         gameWrapper.appendChild(gameContainer);
     });
 
-    document.getElementById("infoText").innerText = `${jsonData.info.issues} results in ${jsonData.info.time}ms`;
+    document.getElementById("infoText").innerText = `${totalIssues} results`;
 }
-
-
-// game cards and stats handler and other onload stuff

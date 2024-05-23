@@ -15,6 +15,10 @@ stuff.txt
 .idea
 *.db
 .htaccess
+
 updater/images/
 updater/config/config.toml
+
 stats.json
+database.json
+game_skips.json
