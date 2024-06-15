@@ -16,7 +16,7 @@
 
 :root {
     --text: #eceff4;
-    --text2: #dee1e7;
+    --text2: #d7d7d7;
     --border: #e1e1e10d;
     --solidBorder: #393b3e;
     --background: #1e1e1e;
@@ -58,6 +58,30 @@ body {
     overflow-y: scroll; /* maybwe? mostly for consistency*/
 }
 
+/*Animation Styles*/
+.NoOpacity {
+    opacity: 0;
+}
+
+
+.headerIcon:not(.NoOpacity), .headerRight:not(.NoOpacity) { /* Header load-in animation*/
+    transition: opacity 300ms ease-out;
+    opacity: 1;
+}
+
+.menuContainer.NoOpacity { /*disappear animation*/
+    transition: opacity 0.2s ease-out;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.menuContainer:not(.NoOpacity) { /* appear animation */
+    transition: opacity 0.2s ease-in;
+    opacity: 1;
+}
+
+
+/*Header*/
 .header {
     width: 100vw;
     height: 55px;
@@ -140,13 +164,11 @@ body {
 
 .menuContainer {
     z-index: 6;
-    display: none;
     position: fixed;
     right: 0;
     margin: 65px 0 0 0;
     width: 100%;
     height: 100%;
-    transition: opacity 0.2s ease;
 }
 
 .menu {

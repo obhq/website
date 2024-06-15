@@ -26,11 +26,12 @@ body {
 }
 
 .Playable {
-    --status-color: #24bb2d;
+    /*--status-color: #24bb2d; */
+    /*--status-color: #86de74; */
+    --status-color: #5fac4e;
 }
 
 .main {
-    /*overflow-y: scroll;*/
     background-color: var(--background-themed);
     width: 100%;
     height: auto;
@@ -42,9 +43,8 @@ body {
     align-content: center;
     position: relative;
     z-index: 2;
-    padding-bottom: 100px;;
 
-    --accent1: rgba(225, 75, 76, 0.9);
+    --accent1: rgba(225, 75, 76, 0.95);
     --accent1H: rgb(234, 80, 80);
 
     --accent2: rgba(250, 83, 83, 0.9);
@@ -110,7 +110,7 @@ body {
     background: var(--accent1);
     margin: 110px 0 30px 0;
     border-radius: 10px;
-    box-shadow: rgba(0, 0, 0, 0.08) 1px 1px 3px;
+    box-shadow: rgba(0, 0, 0, 0.1) 1px 1px 3px;
     padding-top: 30px;
     display: flex;
     flex-direction: column;
@@ -121,16 +121,20 @@ body {
 }
 
 .compMenuText1 {
-    font-size: 1.9rem;
+    font-size: 2rem;
     font-weight: 700;
+    /*line-height: 45px;*/
+    letter-spacing: -0.02rem;
 }
 
 .compMenuStuffText {
     margin-top: 20px;
+    margin-bottom: 40px;
     font-size: 1rem;
-    font-weight: 700;
-    margin-bottom: 50px;
+    font-weight: 600;
     text-align: center;
+    line-height: 22px;
+    letter-spacing: -0.01rem;
 }
 
 .compMenuStatusWrap {
@@ -146,7 +150,7 @@ body {
     user-select: none;
     cursor: pointer;
     box-shadow: rgba(0, 0, 0, 0.03) 1px 1px 2px;
-    transition: background-color 100ms ease-out;
+    transition: background-color 120ms ease-out;
 }
 
 .compMenuStatusWrap:hover {
@@ -157,11 +161,11 @@ body {
     background: var(--accent2D);
 
     .gameMenuStatusAmount {
-        display: block;
+        opacity: 1;
     }
 
     .compMenuStatusInfo {
-        display: none;
+        opacity: 0;
     }
 }
 
@@ -173,7 +177,9 @@ body {
     position: absolute;
     z-index: 3;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 1rem;
+    letter-spacing: -0.01rem;
+    transition: opacity 120ms ease-in;
 }
 
 .compMenuStatusLabel {
@@ -186,7 +192,7 @@ body {
 
 .gameMenuStatusAmount {
     right: 1rem;
-    display: none;
+    opacity: 0;
 }
 
 .gameMenuStatusBar {
@@ -194,23 +200,23 @@ body {
     height: inherit;
     background: var(--status-color);
     border-radius: 5px;
-    transition: width 1s ease-in-out;
+    transition: width 1s ease-out;
 }
 
 .gameMenuSearchBar {
     margin-top: 40px;
     width: 300px;
     height: 40px;
-    border: 0 solid transparent; /* disables default border*/
+    border: none; /* disables default border*/
+    outline: none;
     background: var(--accent2);
     border-radius: 10px;
     padding: 0 1rem;
-    font-size: 15px;
+    font-size: 0.94rem;
     color: var(--text);
-    outline: none;
-    transition: background-color 100ms ease-out;
     font-weight: 600;
     box-shadow: rgba(0, 0, 0, 0.03) 1px 1px 2px;
+    transition: background-color 100ms ease-out;
 }
 
 .gameMenuSearchBar:focus, .gameMenuSearchBar:hover {
@@ -220,14 +226,37 @@ body {
 .gameMenuSearchBar::placeholder {
     color: var(--text2);
     font-weight: 700;
-    font-size: 14px;
+    font-size: 0.9rem;
     user-select: none;
+    opacity: 1;
 }
+
+/*{*/
+/*    color: var(--text2);*/
+/*    font-weight: 700;*/
+/*    font-size: 0.9rem;*/
+/*    user-select: none;*/
+/*    opacity: 1;*/
+/*}*/
 
 .skeletonLoading {
     background-image: linear-gradient(90deg, var(--accent1), var(--accent2H), var(--accent1)) !important;
     background-size: 200% 100% !important;
     animation: skeletonAnimation 2s ease-in-out infinite;
+    cursor: default !important;
+}
+
+.gameCardImageText, .gameCardImage, .gameContent {
+    animation: fadeIn 200ms ease-out 1;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes skeletonAnimation {
@@ -245,12 +274,12 @@ body {
     height: 100px;
     width: 600px;
     margin-top: 6px;
-    transition: background-color 230ms ease-in;
+    transition: background-color 230ms ease-in, background-image 200ms ease-in, animation 200ms ease-in;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: flex-start;
-    box-shadow: rgba(0, 0, 0, 0.08) 1px 1px 3px;
+    box-shadow: rgba(0, 0, 0, 0.1) 1px 1px 3px;
     overflow: hidden;
     cursor: pointer;
     z-index: 2;
@@ -277,6 +306,11 @@ body {
     }
 }
 
+.gameCardImage {
+    font-size: 0;
+    background-color: var(--accent2H);
+}
+
 .gameCardImage, .gameCardImageText {
     width: 100px;
     height: 100px;
@@ -289,10 +323,9 @@ body {
     font-weight: 700;
     align-content: center;
     text-align: center;
-    flex-wrap: wrap;
-    justify-content: center;
     color: var(--text);
     user-select: none;
+    letter-spacing: -0.03rem;
 }
 
 .gameContent {
@@ -312,16 +345,7 @@ body {
     white-space: nowrap;
     text-overflow: ellipsis;
     transition: width 0.4s ease-out;
-    width: 20rem;
-}
-
-.gameCardCode {
-    position: absolute;
-    right: 0;
-    top: 0;
-    font-weight: 500;
-    width: 100px;
-    text-align: center;
+    width: 21rem;
 }
 
 .gameCardTag {
@@ -338,7 +362,17 @@ body {
     justify-content: center;
     border-radius: 12px;
     box-shadow: rgba(0, 0, 0, 0.1) 1px 1px 2px;
-    /* todo : add cool spread box-shadow effect */
+    user-select: none;
+}
+
+.gameCardCode {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-weight: 500;
+    width: 100px;
+    text-align: center;
+    letter-spacing: -0.02rem;
 }
 
 .gameCardUpdated {
@@ -348,16 +382,17 @@ body {
     font-weight: 500;
     width: 100px;
     text-align: center;
+    letter-spacing: -0.03rem;
 }
 
 
 .endMenu {
     width: 600px;
-    height: 100px;
+    height: 150px;
     background: var(--accent1);
-    margin: 30px 0 0 0;
+    margin: 30px 0 55px 0;
     border-radius: 10px;
-    box-shadow: rgba(0, 0, 0, 0.08) 1px 1px 3px;
+    box-shadow: rgba(0, 0, 0, 0.1) 1px 1px 3px;
     padding-top: 20px;
     display: flex;
     flex-direction: column;
@@ -370,6 +405,83 @@ body {
 .endMenuInfoText {
     font-size: 1rem;
     font-weight: 600;
+    /*letter-spacing: -0.5px;*/
+}
+
+.pageBarContainer {
+    display: flex;
+    margin: 10px 0 40px 0;
+    gap: 0.4rem;
+    height: 2rem;
+
+}
+
+.pageBarSearch, .pageBarImage, .pageBarText {
+    background-color: var(--accent2);
+    text-align: center;
+    align-content: center;
+    width: 2.5rem;
+    height: 2.3rem;
+    user-select: none;
+    padding: 0.3rem;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.02) 1px 1px 2px;
+    transition: background-color 100ms ease-out;
+}
+
+.pageBarSearch:hover, .pageBarImage:hover, .pageBarText:hover {
+    background-color: var(--accent2H);
+}
+
+.pageBarSearch:focus {
+    background-color: var(--accent2H);
+}
+
+.pageBarSearch::placeholder {
+    color: var(--text2) !important;
+    /*color: red;!important;*/
+}
+
+.pageBarImage, .pageBarText {
+    cursor: pointer;
+}
+
+.pageBarSearch, .pageBarText, .pageBarSearch::placeholder {
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+    justify-content: center;
+    display: grid;
+}
+
+.pageBarSelected {
+    background-color: var(--accent2DH);
+}
+.pageBarSelected:hover {
+    background-color: var(--accent2D);
+}
+
+.pageBarSelected.pageBarSearch:focus {
+    background-color: var(--accent2DH);
+}
+
+.pageBarSelected.pageBarSearch:focus:hover {
+    background-color: var(--accent2D);
+}
+
+.pageBarSearch {
+    appearance: textfield;
+    outline: none;
+    border: none;
+}
+
+.pageBarSearch::-webkit-inner-spin-button,
+.pageBarSearch::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
+.pageBarImage {
+    font-size: 0;
 }
 
 

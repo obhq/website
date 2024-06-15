@@ -1,152 +1,174 @@
 let databaseJsonData; // :3
-let totalPages;
+let totalPages; // is this needed? like genuinely?
+let currentPage = 1; // starts from 1, NOT 0
 let tagFilter = [];
-let oldestFilter = false;
+let justUpdated;
+let issuesPerPage = 10;
+// let Timer;
+const codeRegex = /[a-zA-Z]{4}[0-9]{5}/;
 
-// Check Avif Support
-console.log(`Hey there! I've implemented an avif support check to spare browsers like Edge from having a stroke :D!`);
-const avif = new Image();
-avif.src = "data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgANogQEAwgMg8f8D///8WfhwB8+ErK42A=";
-avif.onload = function () {
-    console.log('AVIF IS SUPPORTED :D');
-    avifSupport = true;
-};
-avif.onerror = function () {
-    console.log('AVIF IS NOT SUPPORTED D:');
-    avifSupport = false;
-    window.alert("Hey! Your browser doesn't support avif, avif is an image format that has low file sizes while having high quality images. You won't get any game images");
-};
+document.addEventListener('DOMContentLoaded', async function () {
+    let startTime = performance.now()
 
-
-document.addEventListener('DOMContentLoaded', function () {
-    init();
-    adjustScreenSize();
+    // required.js
+    adjustScreenSize(); // might not change the top image for on mobile
+    await init();
+    adjustScreenSize(); // ensure change of top image
     headerShadow();
 
     window.addEventListener('resize', adjustScreenSize);
-    window.addEventListener("scroll", headerUpdate);
+    window.addEventListener("scroll", headerShadow);
+
+    // if no avifSupport
+    if (!avifSupport && !document.cookie.split("; ").find(c => c.startsWith(name))) {
+        alert("Your browser doesn't seem to support AVIF.\nAVIF allows obliteration to display a lot of images without high file sizes. Thus you won't see any game images. \nThis is the only time you will receive this message.");
+
+        let date = new Date();
+        date.setMonth(date.getMonth() + 1);
+        document.cookie = "avifMessage; Expires=" + date.toUTCString();
+    }
 
     // + fetch issues and set the tag bars
-    fetch('../../../updater/database.json')  //todo : change lmao
+    fetch('./database.json')
         .then(response => response.json())
         .then(jsonData => {
-            gameCardHandler(jsonData);
-            databaseJsonData = jsonData;
-            // pageButtonHandler();
+            setTimeout(() => {
 
-            totalIssues = jsonData.length;
-            totalPages = totalIssues / 20;
+                gameCardHandler(jsonData.slice(0, issuesPerPage)); // first 20
 
+                databaseJsonData = jsonData;
 
-            // stats & tag filter
-            console.log("\nCOMPATIBILITY STATS");
+                let totalIssues = jsonData.length;
+                totalPages = Math.ceil(totalIssues / issuesPerPage);
+                PageSelector();
+                // stats & tag filter
+                console.log("\nCOMPATIBILITY STATS");
 
-            let availableTags = ['Nothing', 'Boots', 'Intro', 'Ingame', 'Playable'];
-            let totalPercentage = 0;
-            let naCount = 0;
+                let availableTags = ['Nothing', 'Boots', 'Intro', 'InGame', 'Playable'];
+                let totalPercentage = 0;
+                let naCount = 0;
 
-            let tagPercentages = [];
-            let tagCount = [];
+                let tagPercentages = [];
+                let tagCount = [];
 
-            // get tag count
-            availableTags.forEach(tag => {
-                // init tag count
-                tagCount[tag] = 0;
-
-                jsonData.forEach(issue => {
-                    if (issue.tag === tag) {
-                        tagCount[tag]++;
-
-                    } else if (issue.tag === "N/A") {
-                        naCount++;
-                    }
-                });
-            });
-
-            // get raw tag percentages
-            availableTags.forEach(tag => {
-                let rawPercentage = (tagCount[tag] / (totalIssues - naCount)) * 100;
-
-                tagPercentages[tag] = rawPercentage.toFixed(2);
-                totalPercentage += rawPercentage.toFixed(2);
-            });
-
-            // make percentages correct (mostly ~heh)
-            if (totalPercentage !== 100) {
-                let difference = (100 - totalPercentage) / availableTags.length;
-
+                // get tag count && raw tag percentages
                 availableTags.forEach(tag => {
-                    tagPercentages[tag] = parseFloat(tagPercentages[tag] + difference).toFixed(2);
+                    tagCount[tag] = 0; // init tag count
+
+                    jsonData.forEach(issue => {
+                        if (issue.tag === tag) {
+                            tagCount[tag]++;
+
+                        } else if (issue.tag === "N/A") {
+                            naCount++;
+                        }
+                    });
+
+                    let rawPercentage = parseFloat(((tagCount[tag] / (totalIssues - naCount)) * 100).toFixed(2));
+                    tagPercentages[tag] = rawPercentage;
+                    totalPercentage += rawPercentage;
                 });
-            }
+
+                // make percentages correct (mostly ~heh)
+                if (totalPercentage !== 100) {
+
+                    let difference = (100 - totalPercentage);
+                    tagPercentages["Nothing"] = parseFloat(tagPercentages["Nothing"] + difference).toFixed(2);
+                }
 
 
-            availableTags.forEach(tag => {
-                var percent = tagPercentages[tag];
-                var count = tagCount[tag];
+                // go through each tag and set's the tag bars
+                availableTags.forEach(tag => {
+                    let StatusWrapper = document.getElementById(tag + "Status")
 
-                var tagBar = document.getElementById(tag + 'Bar');
-                var tagContainer = tagBar.parentElement;
-                console.log(`${tag} = ${percent}% [${count}]`);
+                    // iterates through the children of the StatusWrapper, then it iterates through their class lists
+                    Array.from(StatusWrapper.children).forEach(child => child.classList.forEach(name => {
+                        switch (name) {
+                            case "compMenuStatusLabel":
+                                child.classList.remove("NoOpacity");
+                                break;
+                            case "compMenuStatusInfo":
+                                child.textContent = tagPercentages[tag] + '%';
+                                child.classList.remove("NoOpacity");
+                                break;
+                            case "gameMenuStatusAmount":
+                                child.textContent = tagCount[tag];
+                                break;
+                            case "gameMenuStatusBar":
+                                child.style.width = tagPercentages[tag] + '%';
+                                child.classList.remove("NoOpacity");
+                        }
+                    }));
 
-                tagBar.style.width = percent + '%';
-                document.getElementById(tag + 'Percent').textContent = percent + '%';
-                document.getElementById(tag + 'Number').textContent = count;
+                    console.log(`${tag} = ${tagPercentages[tag]}% [${tagCount[tag]}]`);
 
-                tagContainer.addEventListener('click', function () {
-                    tagContainer.classList.toggle('compStatusSelected');
-                    tagFilter.includes(tag) ? tagFilter.splice(tagFilter.indexOf(tag), 1) : tagFilter.push(tag);
+                    // updates the tagFilter when a [tag bar] is clicked
+                    StatusWrapper.addEventListener('click', function () {
+                        StatusWrapper.classList.toggle('compStatusSelected');
+                        tagFilter.includes(tag) ? tagFilter.splice(tagFilter.indexOf(tag), 1) : tagFilter.push(tag);
 
-                    pageNumber = 1;
-                    updateSearchResults();
+                        currentPage = 1;
+                        updateSearchResults();
+                    });
                 });
-            });
+                console.log("\n");
 
-            console.log("\n");
-
+            }, 300 - (performance.now() - startTime)); // fake delay to make animations not look like shit lmao
         })
         .catch(console.error);
 });
 
+
 // Searching
-document.getElementById('search').addEventListener('input', function () {
-    pageNumber = 1;
+function OnGameMenuSearch() {
+    currentPage = 1;
     updateSearchResults();
-});
+}
 
 function updateSearchResults() {
     clearTimeout(Timer);
     const cardsContainer = document.getElementById("CardsContainer");
-    const searchQuery = document.getElementById('search').value.toLowerCase();
+    const searchQuery = document.getElementById('gameSearch').value.toLowerCase();
 
     // skeleton animation
-    cardsContainer.querySelectorAll(".gameCardS, .gameCard, .gameCardE").forEach(container => {
-        const skeletonDiv = document.createElement('a');
+    if (!justUpdated) {
+        justUpdated = true;
+        cardsContainer.querySelectorAll(".gameCardS, .gameCard, .gameCardE").forEach(container => {
+            const skeletonDiv = document.createElement('a');
 
-        container.classList.forEach(name => {
-            skeletonDiv.classList.add(name)
+            container.classList.forEach(name => {
+                skeletonDiv.classList.add(name);
+            });
+
+            skeletonDiv.classList.add("skeletonLoading");
+            cardsContainer.replaceChild(skeletonDiv, container);
         });
-
-        skeletonDiv.classList.add("skeletonLoading");
-        cardsContainer.replaceChild(skeletonDiv, container);
-    });
+    }
 
     Timer = setTimeout(() => {
-        var jsonData = [];
+        let jsonData = [];
+        let isCodeSearch = codeRegex.test(searchQuery);
 
         databaseJsonData.forEach(game => {
-            if (!game.title.toLowerCase().includes(searchQuery)) {
+            // id based searching
+            if (isCodeSearch && (game.code.toLowerCase() !== searchQuery)) {
+                return;
+
+                // title based searching
+            } else if (!isCodeSearch && !game.title.toLowerCase().includes(searchQuery)) {
                 return;
             }
+
 
             if (tagFilter.length > 0) {
                 let isGood = false;
 
-                tagFilter.forEach(tag => {
+                for (const tag of tagFilter) {
                     if (tag === game.tag) {
                         isGood = true;
+                        break;
                     }
-                })
+                }
 
                 if (isGood === false) {
                     return;
@@ -156,7 +178,19 @@ function updateSearchResults() {
             jsonData.push(game);
         });
 
-        gameCardHandler(jsonData);
+
+        let startSlice = (currentPage - 1) * issuesPerPage; // makes it start on 0 if the currentPage = 1
+        let endSlice = startSlice + issuesPerPage; // 20 on first page, 10 on searches
+        totalPages = Math.ceil(jsonData.length / issuesPerPage);
+
+        //
+        // console.log(startSlice);
+        // console.log(endSlice);
+        // console.log(totalPages);
+        gameCardHandler(jsonData.slice(startSlice, endSlice));
+        PageSelector();
+        justUpdated = false;
+
     }, 300);
 }
 
@@ -175,7 +209,7 @@ function gameCardHandler(jsonData) {
         let imageSource;
         let cardType;
         let imageText = "N/A";
-        let imageTextSize = 1.38;
+        let imageTextSize = 1.25;
 
         switch (true) {
             case game.image && avifSupport && game.type === "HB":
@@ -186,9 +220,12 @@ function gameCardHandler(jsonData) {
                 break;
         }
 
-        if (game.type === "HB") { // needs to be applied to all homebrews
+        if (game.type === "GAME") {
+            imageText = "GAME";
+            
+        } else if (game.type === "HB") {
             imageText = "HOME<br>BREW";
-            imageTextSize = 1.25;
+
         } else if (game.type === "SYS") {
             imageText = "SYSTEM";
             imageTextSize = 1.13;
@@ -208,22 +245,101 @@ function gameCardHandler(jsonData) {
 
         // game cards
         const gameElementHTML = `
-    <a class="${cardType ? cardType : `gameCard`} ${game.tag}" target="_blank" href="https://github.com/obhq/compatibility/issues/${game.id}">
-        ${imageSource ? `<img class="gameCardImage" loading="lazy" alt="${game.title} - ${game.code} game image" src="${imageSource}">` : `<p class='gameCardImageText' style='font-size: ${imageTextSize}rem;'>${imageText}</p>`}
-        <div class="gameContent">
-            <p class="gameCardTitle">${game.title}</p>
-            <p class="gameCardCode">${game.code}</p>
-            <p class="gameCardTag">${game.tag}</p>
-            <p class="gameCardUpdated">${game.updated}</p>
-        </div>
-    </a>`;
-        let cardClass = "." + (cardType ? cardType : `gameCard`);
+            <a class="${cardType ? cardType : `gameCard`} ${game.tag}" target="_blank" href="https://github.com/obhq/compatibility/issues/${game.id}">
+                ${imageSource ? `<img class="gameCardImage" loading="lazy" alt="${game.title} - ${game.code} game image" src="${imageSource}">` : `<p class='gameCardImageText' style='font-size: ${imageTextSize}rem;'>${imageText}</p>`}
+                <div class="gameContent">
+                    <p class="gameCardTitle">${game.title}</p>
+                    <p class="gameCardCode">${game.code}</p>
+                    <p class="gameCardTag">${game.tag}</p>
+                    <p class="gameCardUpdated">${game.updated}</p>
+                </div>
+            </a>`;
 
-        const tempContainer = document.createElement('a');
+        const tempContainer = document.createElement('div');
         tempContainer.innerHTML = gameElementHTML;
-        let gameContainer = tempContainer.querySelector(cardClass);
-        gameWrapper.appendChild(gameContainer);
-    });
 
-    document.getElementById("infoText").innerText = `${totalIssues} results`;
+        gameWrapper.appendChild(tempContainer.firstElementChild);
+    });
+    
+
+    // TODO fix with sliced
+    if (totalIssues === 0) {
+        document.getElementById("infoText").innerText = `No results found!`;
+    } else {
+        document.getElementById("infoText").innerText = `${totalIssues} results found`;
+    }
+
+    // Fixes the page jumping when the last page doesn't have 10 issues
+    if (currentPage === (totalPages - 1)) {
+        window.scrollTo({behavior: 'instant', top: document.body.scrollHeight});
+    }
+}
+
+
+function PageSelector(state) {
+    const minNumberElement = document.getElementById("pageSelectorMin");
+    const maxNumberElement = document.getElementById("pageSelectorMax");
+    const pageSearchElement = document.getElementById("pageSelectorSearch");
+
+    console.log(state);
+    let oldPage = currentPage;
+
+    switch (state) {
+        case "search":
+            currentPage = parseInt(pageSearchElement.value);
+            pageSearchElement.value = "";
+            break;
+        case "min":
+            currentPage = 1;
+            break;
+        case "max":
+            currentPage = totalPages;
+            break;
+        case "less":
+            currentPage--;
+            break;
+        case "more":
+            currentPage++;
+
+            break;
+    }
+
+    if (currentPage <= 1) {
+        currentPage = 1;
+        pageSearchElement.placeholder = "...";
+        minNumberElement.classList.add("pageBarSelected");
+        maxNumberElement.classList.remove("pageBarSelected");
+        pageSearchElement.classList.remove("pageBarSelected");
+
+    } else if (currentPage >= totalPages) {
+        currentPage = totalPages;
+        maxNumberElement.classList.add("pageBarSelected");
+        minNumberElement.classList.remove("pageBarSelected");
+        pageSearchElement.classList.remove("pageBarSelected");
+        pageSearchElement.placeholder = "...";
+
+    } else {
+        minNumberElement.classList.remove("pageBarSelected");
+        maxNumberElement.classList.remove("pageBarSelected");
+        pageSearchElement.classList.add("pageBarSelected");
+        pageSearchElement.placeholder = currentPage;
+    }
+
+    if (!(currentPage === oldPage)) {
+        updateSearchResults();
+    }
+    
+    
+    minNumberElement.innerText = "1";
+    maxNumberElement.innerText = totalPages;
+}
+
+function OnPageSelectorSearch() {
+    clearTimeout(Timer);
+
+    Timer = setTimeout(() => {
+
+        PageSelector("search");
+
+    }, 700);
 }

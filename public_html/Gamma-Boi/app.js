@@ -1,17 +1,27 @@
-document.addEventListener('DOMContentLoaded', function () {
-    init();
-    adjustScreenSize();
+document.addEventListener('DOMContentLoaded', async function () {
+    // required.js
+    adjustScreenSize(); // might not change the top image for on mobile
+    
+    await init();
+    adjustScreenSize(); // ensure change of top image
     headerShadow();
     animationHandler();
 
     window.addEventListener('resize', adjustScreenSize);
-    window.addEventListener("scroll", headerUpdate);
+    window.addEventListener("scroll", headerShadow);
 
-    fetch('/stats.json').then(response => response.json()).then(jsonData => {
+    
+    await fetch('/stats.json').then(response => response.json()).then(jsonData => {
         countingAnimation(jsonData.stars, document.getElementById("starsNumber"));
         countingAnimation(jsonData.issues, document.getElementById("issuesNumber"));
         countingAnimation(jsonData.devbuilds, document.getElementById("devbuildsNumber"));
-    })
+    });
+
+    setTimeout(() => {
+        document.querySelectorAll(".tableNumbersContainer").forEach(element => {
+            element.style.transition = "none";
+        });
+    }, 1900); // timed with the transition speed in css
 });
 
 function buttonScroll() {
@@ -29,7 +39,7 @@ function countingAnimation(number, element) {
         for (let i = 0; i < 10; i++) {
             spanList += `<span class="midText text-themed">${i}</span>`;
         }
-        
+
         element.innerHTML += `<span class="tableNumbersContainer" style="transform: translateY(-1000%)">${spanList}`;
     });
 

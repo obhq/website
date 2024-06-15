@@ -114,7 +114,7 @@ fn main() {
     let mut new_issues: Vec<Issue> = Vec::new();
 
     let old_issues: Vec<Issue> = {
-        let json_string: String = fs::read_to_string("./database.json").unwrap_or_default();
+        let json_string: String = fs::read_to_string("../database.json").unwrap_or_default();
 
         serde_json::from_str(&json_string).unwrap_or_default()
     };
@@ -217,7 +217,7 @@ fn main() {
 
                 match &tags {
                     x if x.contains(&config.tag_playable) => tag = "Playable",
-                    x if x.contains(&config.tag_ingame) => tag = "Ingame",
+                    x if x.contains(&config.tag_ingame) => tag = "InGame",
                     x if x.contains(&config.tag_intro) => tag = "Intro",
                     x if x.contains(&config.tag_boots) => tag = "Boots",
                     x if x.contains(&config.tag_nothing) => tag = "Nothing",

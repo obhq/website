@@ -14,21 +14,23 @@
     <meta name="twitter:card" content="summary_large_image"/>
     <meta name="twitter:title" content="Obliteration - Compatibility List"/>
     <meta name="twitter:description" content="Here you can view all the tested games and apps on Obliteration."/>
-    <meta name="twitter:image:src" content="https://obliteration.net/_images/Obliteration.png"/>
+    <meta name="twitter:image:src" content="/_images/Obliteration.png"/>
     <meta property="og:title" content="Obliteration - An experimental open-source PS4 emulator">
     <meta property="og:description" content="Here you can view all the tested games and apps on Obliteration.">
     <meta property="og:image" content="/_images/Obliteration.png">
     <meta property="og:url" content="https://obliteration.net">
-    <link rel="icon" href="https://obliteration.net/_images/Obliteration-smoll.png" type="image/png">
+    <link rel="icon" href="/_images/Obliteration-smoll.png" type="image/png">
     <link rel="preconnect" href="https://rsms.me/">
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
     <link rel="stylesheet" href="/required.css">
     <link rel="stylesheet" href="./styles.css">
     <meta name="darkreader-lock"> <!-- for disabling dark mode with dark reader -->
+    <script defer src="/required.js"></script>
+    <script defer src="./app.js"></script>
 </head>
 <body>
 <header class="header" id="header"></header>
-<div class="menuContainer" id="menu"></div>
+<div id="menu"></div>
 
 <main class="main">
     <div class="background">
@@ -36,59 +38,92 @@
         <div class="backgroundPlane2"></div>
     </div>
 
+    <!-- top statuscards -->
     <div class="compMenu">
         <p class="compMenuText1">Compatibility List</p>
         <p class="compMenuStuffText">These are the currently tested games and applications on Obliteration.<br>
                                      Clicking on a card will redirect you to the GitHub issue.</p>
 
-        <div class="compMenuStatusWrap Playable">
+        <div class="compMenuStatusWrap Playable" id="PlayableStatus">
             <span class="compMenuStatusLabel">Playable</span>
-            <span class="compMenuStatusInfo" id="PlayablePercent"></span>
-            <span class="gameMenuStatusAmount" id="PlayableNumber"></span>
-            <div class="gameMenuStatusBar" id="PlayableBar" style="width: 0;"></div>
+            <span class="compMenuStatusInfo NoOpacity"></span>
+            <span class="gameMenuStatusAmount"></span>
+            <div class="gameMenuStatusBar NoOpacity"></div>
         </div>
 
-        <div class="compMenuStatusWrap InGame">
+        <div class="compMenuStatusWrap InGame" id="InGameStatus">
             <span class="compMenuStatusLabel">InGame</span>
-            <span class="compMenuStatusInfo" id="IngamePercent"></span>
-            <span class="gameMenuStatusAmount" id="IngameNumber"></span>
-            <div class="gameMenuStatusBar" id="IngameBar" style="width: 0;"></div>
+            <span class="compMenuStatusInfo NoOpacity"></span>
+            <span class="gameMenuStatusAmount"></span>
+            <div class="gameMenuStatusBar NoOpacity"></div>
         </div>
 
-        <div class="compMenuStatusWrap Intro">
+        <div class="compMenuStatusWrap Intro" id="IntroStatus">
             <span class="compMenuStatusLabel">Intro</span>
-            <span class="compMenuStatusInfo" id="IntroPercent"></span>
-            <span class="gameMenuStatusAmount" id="IntroNumber"></span>
-            <div class="gameMenuStatusBar" id="IntroBar" style="width: 0;"></div>
+            <span class="compMenuStatusInfo NoOpacity"></span>
+            <span class="gameMenuStatusAmount"></span>
+            <div class="gameMenuStatusBar NoOpacity"></div>
         </div>
 
-        <div class="compMenuStatusWrap Boots">
+        <div class="compMenuStatusWrap Boots" id="BootsStatus">
             <span class="compMenuStatusLabel">Boots</span>
-            <span class="compMenuStatusInfo" id="BootsPercent"></span>
-            <span class="gameMenuStatusAmount" id="BootsNumber"></span>
-            <div class="gameMenuStatusBar" id="BootsBar" style="width: 0;"></div>
+            <span class="compMenuStatusInfo NoOpacity"></span>
+            <span class="gameMenuStatusAmount"></span>
+            <div class="gameMenuStatusBar NoOpacity"></div>
         </div>
 
-        <div class="compMenuStatusWrap Nothing">
+        <div class="compMenuStatusWrap Nothing" id="NothingStatus">
             <span class="compMenuStatusLabel">Nothing</span>
-            <span class="compMenuStatusInfo" id="NothingPercent"></span>
-            <span class="gameMenuStatusAmount" id="NothingNumber"></span>
-            <div class="gameMenuStatusBar" id="NothingBar" style="width: 0;"></div>
+            <span class="compMenuStatusInfo NoOpacity"></span>
+            <span class="gameMenuStatusAmount"></span>
+            <div class="gameMenuStatusBar NoOpacity"></div>
         </div>
 
         <label>
-            <input autocomplete="off" type="text" name="obliteration" class="gameMenuSearchBar" placeholder="GAME TITLE / ID" id="search">
+            <input autocomplete="off" type="text" name="obliteration" class="gameMenuSearchBar" placeholder="GAME TITLE / ID" id="gameSearch" oninput="OnGameMenuSearch()">
         </label>
+
     </div>
 
-    <div id="CardsContainer"></div>
-    
+    <!-- 10 Placeholders for when it's fetching the database -->
+    <div id="CardsContainer">
+        <div class="gameCardS skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCard skeletonLoading"></div>
+        <div class="gameCardE skeletonLoading"></div>
+    </div>
+
     <div class="endMenu">
-        <h4 class="endMenuInfoText" id="infoText">0 results in 0ms</h4>
-        <h4>page selector here :3</h4>
+
+        <div class="pageBarContainer">
+            <img class="pageBarImage" alt="Arrow pointing Backwards" src="/_images/arrow_forward.svg" style="rotate: 180deg" onclick="PageSelector('less')">
+            <p class="pageBarText" id="pageSelectorMin" onclick="PageSelector('min')"></p>
+            <label>
+                <input autocomplete="off" type="number" min="1" name="obliteration" class="pageBarSearch" placeholder="..." id="pageSelectorSearch" oninput="OnPageSelectorSearch()">
+            </label>
+            <p class="pageBarText" id="pageSelectorMax" onclick="PageSelector('max')"></p>
+            <img class="pageBarImage" alt="Arrow pointing Forwards" src="/_images/arrow_forward.svg" onclick="PageSelector('more')">
+        </div>
+
+        <h4 class="endMenuInfoText" id="infoText">Fetching Results</h4>
+        <!--        <h4>page selector here :3</h4>-->
     </div>
 </main>
 </body>
-<script defer src="/required.js"></script>
-<script src="./app.js"></script>
 </html>

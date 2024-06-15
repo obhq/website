@@ -1,8 +1,9 @@
-// some required stuff like screen adjustments, html loading etc.
+// This script has required functions that *most* pages use, e.g. the insertion of the header or the dynamic size adjuster
 
-var menuState = true;
-var Timer = 0;
-
+let menuState = true;
+let Timer = 0;
+// let url_prefix = "/obhqWebsite/public_html/Gamma-Boi"
+let avifSupport;
 
 // Adjust screen size for mobile and 4k monitors for some reason
 function adjustScreenSize() {
@@ -23,86 +24,100 @@ function adjustScreenSize() {
         document.documentElement.style.fontSize = fontSize + 'px';
     }
 
-    if (screenWidth < "370") {
-        document.getElementById("headerIcon").src = "/_images/Obliteration-smoll.png";
-    } else {
-        document.getElementById("headerIcon").src = "/_images/Obliteration.png";
+    if (document.getElementById("headerIcon")) {
+        let headerIcon = document.getElementById("headerIcon");
+
+        if (screenWidth < "370") {
+            // no point to check for avif here, since the favicon already loads the png version :/
+            headerIcon.src = "/_images/Obliteration-smoll.png";
+
+        } else {
+            // check avif support
+            if (avifSupport && headerIcon.src !== ("/_images/Obliteration.avif")) {
+                headerIcon.src = "/_images/Obliteration.avif";
+
+            } else if (!avifSupport && headerIcon.src !== ("/_images/Obliteration.png")) {
+                headerIcon.src = "/_images/Obliteration.png";
+            }
+        }
     }
 }
 
-function headerUpdate() {
-    requestAnimationFrame(headerShadow)
-    // headerShadow()
-}
 
-
+// Adds a shadow to the header when scrolling
 function headerShadow() {
-    const header = document.querySelector('header');
+    requestAnimationFrame(() => {
+        const header = document.querySelector('header');
 
-    if (window.scrollY > 0) {
-        header.style.boxShadow = "0 1px 5px rgb(0, 0, 0, 0.2)";
-    } else {
-        header.style.boxShadow = '';
-    }
+        if (window.scrollY > 0) {
+            header.style.boxShadow = "0 1px 5px rgb(0, 0, 0, 0.2)";
+        } else {
+            header.style.boxShadow = '';
+        }
+    });
 }
 
-
+// used for the hamburger menu button [on mobile]
 function menuButton() {
     const menu = document.getElementById("menu");
     const menuButton = document.getElementById("menuButton");
-    clearTimeout(Timer);
 
-    if (menuState === true) {
+    if (menuState === true) { // if its open, close it
         menuState = false;
         menuButton.src = "/_images/close.svg";
-        menu.style.display = "flex";
-        menu.style.opacity = 0;
+        menu.classList.remove("NoOpacity")
 
-        Timer = setTimeout(() => {
-            menu.style.opacity = 1;
-        }, 10);
-    } else if (menuState === false) {
+    } else if (menuState === false) { // if its closed, open it
         menuState = true;
         menuButton.src = "/_images/menu.svg";
-        menu.style.opacity = 0;
-
-        Timer = setTimeout(() => {
-            menu.style.display = "none";
-        }, 200);
+        menu.classList.add("NoOpacity");
     }
 }
 
-function offMenu() {
-    menuButton();
-}
-
+// Used to animate elements that become visible
 function animationHandler() {
-    const observer = new IntersectionObserver(toAnimate, {threshold: 0.5});
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            console.log(entry);
+            if (entry.isIntersecting) {
+                entry.target.classList.add("animate");
+            } else {
+                entry.target.classList.remove("animate");
+            }
+        });
+    }, {threshold: 0.6});
 
     document.querySelectorAll('.toAnimate').forEach(element => {
         observer.observe(element);
     });
-
-    function toAnimate(entries, observer) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.remove("toAnimate");
-                observer.unobserve(entry.target);
-
-                entry.target.classList.add("animate");
-            }
-        });
-    }
 }
 
+function avifSupportCheck() {
+    return new Promise(resolve => {
+        const avif = new Image();
+        avif.src = "data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgANogQEAwgMg8f8D///8WfhwB8+ErK42A=";
 
-function init() {
+        avif.onload = function () {
+            console.log('AVIF IS SUPPORTED :D');
+            resolve(true);
+        };
+
+        avif.onerror = function () {
+            console.warn('AVIF IS NOT SUPPORTED D:');
+            resolve(false);
+        };
+    });
+}
+
+async function init() {
+    avifSupport = await avifSupportCheck();
+
     let header_html = `
         <header class="header">
-            <a class="headerIcon" href="/">
-                <img id="headerIcon" src="/_images/Obliteration.png" height="40px" width="auto" alt="Obliteration logo">
+            <a class="headerIcon NoOpacity" href="/">
+                <img id="headerIcon" src="/_images/Obliteration.avif" height="40px" width="auto" alt="Obliteration logo">
             </a>
-            <div class="headerRight">
+            <div class="headerRight NoOpacity">
                 <a class="headerLink" href="./download">Download</a>
                 <a class="headerLink" href="./compatibility">Compatibility</a>
                 <a class="headerLink" href="./wiki">Wiki</a>
@@ -119,7 +134,7 @@ function init() {
         </header>`;
 
     let menu_html = `
-        <div class="menuContainer" id="menu" onclick="offMenu()">
+        <div class="menuContainer NoOpacity" id="menu" onclick="menuButton()">
             <div class="menu">
                 <a class="menuLink" href="./download">Download</a>
                 <a class="menuLink" href="./compatibility">Compatibility</a>
@@ -129,4 +144,23 @@ function init() {
 
     document.getElementById("header").outerHTML = header_html;
     document.getElementById("menu").outerHTML = menu_html;
+
+    // Animation, 
+    let imagesLoaded = 0;
+    const images = document.querySelector(".header").querySelectorAll("img");
+
+    images.forEach(image => {
+        image.addEventListener("load", () => {
+            imagesLoaded++;
+            if (imagesLoaded === images.length) {
+                requestAnimationFrame(() => {
+
+                    document.querySelector(".headerIcon").classList.remove("NoOpacity");
+                    document.querySelector(".headerRight").classList.remove("NoOpacity");
+                });
+            }
+        })
+    })
+
+    return avifSupport;
 }
