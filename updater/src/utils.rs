@@ -4,22 +4,23 @@ use rusqlite::Connection;
 use serde::Serialize;
 use serde_json::Value;
 
-use crate::github_request;
+use crate::config::Config;
 
 pub enum ImageTypes<'lt> {
-    Game(&'lt str, String, &'lt String, &'lt Vec<u8>),
+    Game(&'lt str, String, &'lt String, &'lt String),
     Hb(&'lt str, String, &'lt Connection, &'lt String),
 }
 
 pub fn image_handler(image_type: ImageTypes) -> Result<(), anyhow::Error> {
     use hmac::{Hmac, Mac};
     use sha1::Sha1;
+    use hex::FromHex;
 
     return match image_type {
         // Game issue
-        ImageTypes::Game(user_agent, path, code, tmdb_hash) => {
+        ImageTypes::Game(user_agent, path, code, tmdb_hex) => {
             // create the url based on the tmdb hash
-            let mut hmac = Hmac::<Sha1>::new_from_slice(tmdb_hash)?;
+            let mut hmac = Hmac::<Sha1>::new_from_slice(&Vec::from_hex(tmdb_hex)?)?;
             let image_code = format!("{}_00", code);
             hmac.update(image_code.as_bytes());
             let hmac = hmac.finalize().into_bytes();
@@ -102,17 +103,19 @@ struct StatsJson {
 }
 
 pub fn stats_creator(path: &str, token: &str, github_main: &str, github_comp: &str, workflow: &str) -> Result<(), anyhow::Error> {
-    let stars = github_request(&github_main, &token)
+    use crate::github_request;
+
+    let stars = github_request(github_main, token)
         .get("stargazers_count")
         .and_then(Value::as_u64)
         .expect("Failed to parse JSON o.o!");
 
-    let issues = github_request(&github_comp, &token)
+    let issues = github_request(github_comp, token)
         .get("open_issues_count")
         .and_then(Value::as_u64)
         .expect("Failed to parse JSON o.o!");
 
-    let devbuilds = github_request(&workflow, &token)
+    let dev_builds = github_request(workflow, token)
         .get("workflow_runs")
         .unwrap()
         .get(0)
@@ -124,10 +127,74 @@ pub fn stats_creator(path: &str, token: &str, github_main: &str, github_comp: &s
     let stats_json: StatsJson = StatsJson {
         stars: stars.to_string(),
         issues: issues.to_string(),
-        devbuilds: devbuilds.to_string(),
+        devbuilds: dev_builds.to_string(),
     };
 
-    let stats_string = serde_json::to_string(&stats_json).expect("Error serializing the stats.json!");
-    fs::write(format!("{}stats.json", path), stats_string).expect("Error creating config!");
+    let stats_string = serde_json::to_string(&stats_json)?;
+
+    fs::write(path, stats_string)?;
+    Ok(())
+}
+
+pub fn homebrew_database_updater(config: &Config) -> Result<(), anyhow::Error> {
+    use md5::{Digest, Md5};
+    use chrono::{Timelike, Utc};
+    use hex::encode;
+    use std::fs::File;
+    use std::path::Path;
+
+    let minute: u32 = Utc::now().minute();
+    //let minute: u32 = 58; // for debug
+
+    // Checks if homebrew database is up-to-date
+    if !(4..=57).contains(&minute) || !Path::new(&config.homebrew_database).exists() {
+        let hash_response = ureq::get("https://api.pkg-zone.com/api.php?db_check_hash=true")
+            .set("User-Agent", &config.homebrew_token)
+            .call()?;
+
+        let new_hash: String = {
+            let body: Value = hash_response.into_json()?;
+
+            body.get("hash")
+                .and_then(Value::as_str)
+                .ok_or_else(|| anyhow::anyhow!("Error while getting new_hash!"))?
+                .to_string()
+        };
+
+        // this also checks if the file exists, if it doesn't the hash will not match and the database will be downloaded :3!
+        let local_hash: String = match fs::read(&config.homebrew_database) {
+            Ok(file) => encode(Md5::digest(file)),
+            Err(err) => {
+                println!("Homebrew Database not found: {}", err);
+                "0".to_string()
+            }
+        };
+
+        // Compares the current hash with the new hash
+        if new_hash == local_hash {
+            println!("Homebrew Database is up-to-date!");
+        } else {
+            println!(
+                "MD5Hash: {} => {} \nUpdating database!",
+                local_hash, new_hash
+            );
+
+            // Downloads the new database
+            let database_response = ureq::get("https://api.pkg-zone.com/store.db")
+                .set("User-Agent", &config.homebrew_token)
+                .call()?;
+
+            let mut file = File::create(&config.homebrew_database).expect("failed to create file");
+
+            match std::io::copy(&mut database_response.into_reader(), &mut file) {
+                Ok(_) => {
+                    println!("Saved database in: \"{}\" Successfully!", &config.homebrew_database);
+                }
+                Err(err) => {
+                    panic!("Aborting, error saving homebrew database: {}", err)
+                }
+            };
+        }
+    }
     Ok(())
 }

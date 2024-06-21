@@ -18,6 +18,8 @@ stuff.txt
 
 updater/images/
 updater/config/config.toml
+/public_html/Gamma-Boi/compatibility/_images/games/
+/public_html/Gamma-Boi/compatibility/_images/hb/
 
 stats.json
 database.json

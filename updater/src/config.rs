@@ -1,46 +1,23 @@
 use std::fs;
 
-use hex::FromHex;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
-struct Config {
-    compat_github_url: String,
-    github_url: String,
-    github_token: String,
-    homebrew_token: String,
-    ps4_useragent: String,
-    tmdb_hash: String,
-    workflow_url: String,
-
-    games_folder: String,
-    homebrew_folder: String,
-    homebrew_database: String,
-    database: String,
-    stats_folder: String,
-
-    homebrew: u64,
-    playable: u64,
-    ingame: u64,
-    intro: u64,
-    boots: u64,
-    nothing: u64,
-}
-
-pub struct AppConfig {
-    pub api_url: String,
-    pub github_url: String,
-    pub api_token: String,
+pub struct Config {
+    pub compat_api_url: String,
+    pub main_api_url: String,
+    pub github_api_token: String,
     pub homebrew_token: String,
     pub ps4_useragent: String,
-    pub tmdb_hash: Vec<u8>,
+    pub tmdb_hex: String,
     pub workflow_url: String,
 
-    pub games_folder: String,
-    pub homebrew_folder: String,
+    pub game_images_folder: String,
+    pub homebrew_images_folder: String,
     pub homebrew_database: String,
+    pub game_skips_database: String,
     pub database: String,
-    pub stats_folder: String,
+    pub stats_file: String,
 
     pub tag_homebrew: u64,
     pub tag_playable: u64,
@@ -50,84 +27,82 @@ pub struct AppConfig {
     pub tag_nothing: u64,
 }
 
-
-pub fn get_config() -> AppConfig {
-    let config_data: Config = config_creator();
-
-    AppConfig {
-        api_url: config_data.compat_github_url,
-        github_url: config_data.github_url,
-        api_token: config_data.github_token,
-        homebrew_token: config_data.homebrew_token,
-        ps4_useragent: config_data.ps4_useragent,
-        tmdb_hash: Vec::from_hex(config_data.tmdb_hash).expect("Invalid tmdb hash!"),
-        workflow_url: config_data.workflow_url,
-
-        games_folder: config_data.games_folder,
-        homebrew_folder: config_data.homebrew_folder,
-        homebrew_database: config_data.homebrew_database,
-        database: config_data.database,
-        stats_folder: config_data.stats_folder,
-
-        tag_homebrew: config_data.homebrew,
-        tag_playable: config_data.playable,
-        tag_ingame: config_data.ingame,
-        tag_intro: config_data.intro,
-        tag_boots: config_data.boots,
-        tag_nothing: config_data.nothing,
-    }
-}
-
-fn config_creator() -> Config {
+pub fn config_creator() -> Config {
     use std::path::Path;
 
     const FOLDER_CONFIG: &str = "./config/";
 
     let config_data: Config = {
-        let config = Config {
-            compat_github_url: "https://api.github.com/repos/obhq/compatibility".to_string(),
-            github_url: "https://api.github.com/repos/obhq/obliteration".to_string(),
-            github_token: "".to_string(),
-            homebrew_token: "".to_string(),
-            ps4_useragent: "Mozilla/5.0 (PlayStation; PlayStation 4/11.00) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15".to_string(),
-            tmdb_hash: "".to_string(),
-            workflow_url: "https://api.github.com/repos/obhq/obliteration/actions/workflows/36859008/runs".to_string(),
-
-            games_folder: "./images/games/".to_string(),
-            homebrew_folder: "./images/hb/".to_string(),
-            homebrew_database: "./HBstore.db".to_string(),
-            database: "./main.db".to_string(),
-            stats_folder: "".to_string(),
-
-            homebrew: 6164722453,
-            playable: 6164497050,
-            ingame: 6164500133,
-            intro: 6164505028,
-            boots: 6164509950,
-            nothing: 6164514963,
-        };
-
-        let config_string = toml::to_string_pretty(&config).unwrap();
         let config_file = format!("{}config.toml", FOLDER_CONFIG);
 
         if !Path::new(&config_file).exists() {
-            fs::create_dir_all(FOLDER_CONFIG).expect("Error creating folders!");
-            fs::write(&config_file, config_string).expect("Error creating config!");
-        }
+            let config = Config {
+                compat_api_url: "https://api.github.com/repos/obhq/compatibility".to_string(),
+                main_api_url: "https://api.github.com/repos/obhq/obliteration".to_string(),
+                github_api_token: "".to_string(),
+                homebrew_token: "".to_string(),
+                ps4_useragent: "Mozilla/5.0 (PlayStation; PlayStation 4/11.00) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15".to_string(),
+                tmdb_hex: "".to_string(),
+                workflow_url: "https://api.github.com/repos/obhq/obliteration/actions/workflows/36859008/runs".to_string(),
 
-        let toml_content = fs::read_to_string(&config_file).expect("Error reading config");
-        toml::from_str(&toml_content).expect("Error deserializing TOML")
+                game_images_folder: "./images/games/".to_string(),
+                homebrew_images_folder: "./images/hb/".to_string(),
+                homebrew_database: "./HBstore.db".to_string(),
+                game_skips_database: "./game_skips.json".to_string(),
+                database: "./database.json".to_string(),
+                stats_file: "./stats.json".to_string(),
+
+                tag_homebrew: 6164722453,
+                tag_playable: 6164497050,
+                tag_ingame: 6164500133,
+                tag_intro: 6164505028,
+                tag_boots: 6164509950,
+                tag_nothing: 6164514963,
+            };
+
+            // create default config
+            fs::create_dir_all(FOLDER_CONFIG).expect("Error creating folders!");
+            fs::write(&config_file, toml::to_string_pretty(&config).unwrap()).expect("Error creating config!");
+
+            return config;
+        } else {
+            let toml_content = fs::read_to_string(&config_file).expect("Error reading config");
+            toml::from_str(&toml_content).expect("Error deserializing TOML")
+        }
     };
 
+    // create needed folders
+    let game_images_folder = Path::new(&config_data.game_images_folder);
+    let homebrew_images_folder = Path::new(&config_data.homebrew_images_folder);
 
-    if !Path::new(config_data.games_folder.as_str()).exists() {
-        fs::create_dir_all(config_data.games_folder.as_str()).expect("Error creating folders!");
+    let database_folder = Path::new(&config_data.database).parent().unwrap();
+    let hb_database_folder = Path::new(&config_data.homebrew_database).parent().unwrap();
+    let game_skips_database_folder = Path::new(&config_data.game_skips_database).parent().unwrap();
+    let stats_file_folder = Path::new(&config_data.stats_file).parent().unwrap();
+
+
+    if !game_images_folder.exists() {
+        fs::create_dir_all(game_images_folder).expect("Error creating folders for \"game_image\"!");
     }
-    if !Path::new(config_data.homebrew_folder.as_str()).exists() {
-        fs::create_dir_all(config_data.homebrew_folder.as_str()).expect("Error creating folders!");
+
+    if !homebrew_images_folder.exists() {
+        fs::create_dir_all(homebrew_images_folder).expect("Error creating folders for \"homebrew_image\"!");
     }
-    if !Path::new(config_data.stats_folder.as_str()).exists() {
-        fs::create_dir_all(config_data.stats_folder.as_str()).expect("Error creating folders!");
+
+    if !database_folder.exists() {
+        fs::create_dir_all(database_folder).expect("Error creating folders for \"database\"!");
+    }
+
+    if !hb_database_folder.exists() {
+        fs::create_dir_all(hb_database_folder).expect("Error creating folders for \"hb_database\"!");
+    }
+
+    if !game_skips_database_folder.exists() {
+        fs::create_dir_all(game_skips_database_folder).expect("Error creating folders for \"game_skips_database\"!");
+    }
+
+    if !stats_file_folder.exists() {
+        fs::create_dir_all(stats_file_folder).expect("Error creating folders for \"stats_file\"!");
     }
 
     config_data

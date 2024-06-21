@@ -13,7 +13,7 @@ body {
     background-color: var(--background-themed);
     width: 100%;
     height: 100vh;
-    box-shadow: rgba(0, 0, 0, 0.1) 0 1px 3px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 0.06rem 0.18rem;
     z-index: 2;
     min-height: 900px;
 }
@@ -96,11 +96,12 @@ body {
 
 .mainText1 {
     position: relative;
+    letter-spacing: -1px;
 }
 
 .mainText2 {
     position: relative;
-    margin-top: 30px;
+    margin-top: 1.9rem;
 }
 
 .mainTable {
@@ -140,7 +141,7 @@ body {
 /* #822223 */
 .mainButton:hover {
     background-color: #5c0504;
-    box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0.06rem 0.12rem 0.18rem 0.06rem rgba(0, 0, 0, 0.1);
 }
 
 .main2 {
@@ -196,8 +197,8 @@ body {
     height: 28rem;
     right: 0;
     background-color: var(--main2);
-    border-radius: 6px;
-    box-shadow: rgba(0, 0, 0, 0.4) 1px 2px 5px;
+    border-radius: 0.4rem;
+    box-shadow: rgba(0, 0, 0, 0.4) 0.06rem 0.12rem 0.32rem;
     font-size: 0; /*hide alt text*/
 }
 
@@ -206,6 +207,9 @@ body {
     margin-left: 4rem;
 }
 
+.main2Text1 {
+    letter-spacing: -1px;
+}
 
 @media screen and (max-width: 1600px) {
     /*2385 × 1335*/
@@ -280,7 +284,6 @@ body {
 }
 
 /* most phones... i think? (hope) */
-/*(min-height: 500px) and*/
 @media (min-height: 520px) and (max-width: 460px) {
     .main, .main2 {
         min-height: 0;

@@ -6,11 +6,10 @@ let Timer = 0;
 let avifSupport;
 
 // Adjust screen size for mobile and 4k monitors for some reason
-function adjustScreenSize() {
+function adjustScreenSize(phoneReferenceWidth) {
     let screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
     let referenceWidth = 1920;
     let referenceFontSize = 16;
-    let phoneReferenceWidth = 700;
 
     if (screenWidth >= referenceWidth) { // 2000 ++
         let fontSize = (screenWidth / referenceWidth) * referenceFontSize;
@@ -78,7 +77,6 @@ function menuButton() {
 function animationHandler() {
     const observer = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
-            console.log(entry);
             if (entry.isIntersecting) {
                 entry.target.classList.add("animate");
             } else {
@@ -122,10 +120,10 @@ async function init() {
                 <a class="headerLink" href="./compatibility">Compatibility</a>
                 <a class="headerLink" href="./wiki">Wiki</a>
                 <div class="headerRightIcons">
-                    <a href="https://github.com/obhq/obliteration" target="_blank" style="display: flex;">
+                    <a href="https://github.com/obhq/obliteration" target="_blank" rel="noopener" style="display: flex;">
                         <img class="headerRightIconGithub" src="/_images/github.svg" alt="GitHub logo">
                     </a>
-                    <a href="https://discord.gg/Qsdaxj6tnH" target="_blank" style="display: flex;">
+                    <a href="https://discord.gg/Qsdaxj6tnH" target="_blank" rel="noopener" style="display: flex;">
                         <img class="headerRightIconDiscord" src="/_images/discord.svg" alt="Discord logo">
                     </a>
                     <img class="headerRightIconMenu" src="/_images/menu.svg" onclick="menuButton()" id="menuButton" alt="Mobile menu button">

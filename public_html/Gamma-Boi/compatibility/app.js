@@ -4,6 +4,7 @@ let currentPage = 1; // starts from 1, NOT 0
 let tagFilter = [];
 let justUpdated;
 let issuesPerPage = 10;
+let issuesCount;
 // let Timer;
 const codeRegex = /[a-zA-Z]{4}[0-9]{5}/;
 
@@ -11,12 +12,14 @@ document.addEventListener('DOMContentLoaded', async function () {
     let startTime = performance.now()
 
     // required.js
-    adjustScreenSize(); // might not change the top image for on mobile
+    adjustScreenSize(610); // might not change the top image for on mobile
     await init();
-    adjustScreenSize(); // ensure change of top image
+    adjustScreenSize(610); // ensure change of top image
     headerShadow();
 
-    window.addEventListener('resize', adjustScreenSize);
+    window.addEventListener('resize', () => {
+        adjustScreenSize(610);
+    });
     window.addEventListener("scroll", headerShadow);
 
     // if no avifSupport
@@ -33,15 +36,16 @@ document.addEventListener('DOMContentLoaded', async function () {
         .then(response => response.json())
         .then(jsonData => {
             setTimeout(() => {
-
-                gameCardHandler(jsonData.slice(0, issuesPerPage)); // first 20
+                let totalIssues = jsonData.length;
 
                 databaseJsonData = jsonData;
-
-                let totalIssues = jsonData.length;
+                issuesCount = totalIssues;
                 totalPages = Math.ceil(totalIssues / issuesPerPage);
-                PageSelector();
-                // stats & tag filter
+
+                gameCardHandler(jsonData.slice(0, issuesPerPage)); // first 10
+                PageSelectorUpdater();
+
+                // stats && tag filter
                 console.log("\nCOMPATIBILITY STATS");
 
                 let availableTags = ['Nothing', 'Boots', 'Intro', 'InGame', 'Playable'];
@@ -91,10 +95,10 @@ document.addEventListener('DOMContentLoaded', async function () {
                                 child.textContent = tagPercentages[tag] + '%';
                                 child.classList.remove("NoOpacity");
                                 break;
-                            case "gameMenuStatusAmount":
+                            case "compMenuStatusAmount":
                                 child.textContent = tagCount[tag];
                                 break;
-                            case "gameMenuStatusBar":
+                            case "compMenuStatusBar":
                                 child.style.width = tagPercentages[tag] + '%';
                                 child.classList.remove("NoOpacity");
                         }
@@ -119,12 +123,14 @@ document.addEventListener('DOMContentLoaded', async function () {
 });
 
 
-// Searching
-function OnGameMenuSearch() {
+// Searching in the game menu
+function OnCompMenuSearch() {
     currentPage = 1;
     updateSearchResults();
 }
 
+
+// it searches the json and updates any needed variables
 function updateSearchResults() {
     clearTimeout(Timer);
     const cardsContainer = document.getElementById("CardsContainer");
@@ -159,7 +165,7 @@ function updateSearchResults() {
                 return;
             }
 
-
+            // filter tags
             if (tagFilter.length > 0) {
                 let isGood = false;
 
@@ -179,79 +185,79 @@ function updateSearchResults() {
         });
 
 
-        let startSlice = (currentPage - 1) * issuesPerPage; // makes it start on 0 if the currentPage = 1
-        let endSlice = startSlice + issuesPerPage; // 20 on first page, 10 on searches
-        totalPages = Math.ceil(jsonData.length / issuesPerPage);
+        let startSlice = (currentPage - 1) * issuesPerPage; // makes it start on 0
+        let endSlice = startSlice + issuesPerPage;
 
-        //
-        // console.log(startSlice);
-        // console.log(endSlice);
-        // console.log(totalPages);
+        totalPages = Math.ceil(jsonData.length / issuesPerPage);
+        issuesCount = jsonData.length;
+
         gameCardHandler(jsonData.slice(startSlice, endSlice));
-        PageSelector();
+        PageSelectorUpdater();
         justUpdated = false;
 
     }, 300);
 }
 
 
-// Game Card handler
+// Game Card handler, it updates the game cards
 function gameCardHandler(jsonData) {
     const gameWrapper = document.getElementById("CardsContainer");
     gameWrapper.innerHTML = "";
 
+
     let currentIssue = 0;
-    let totalIssues = jsonData.length;
+    let totalCurrentIssues = jsonData.length;
 
     jsonData.forEach(game => {
         currentIssue++;
-        // game image URL
+
         let imageSource;
         let cardType;
         let imageText = "N/A";
         let imageTextSize = 1.25;
 
+        // sets the image url's && text in case there is no image
         switch (true) {
             case game.image && avifSupport && game.type === "HB":
-                imageSource = "https://obliteration.net/_images/HB/" + game.title + ".avif";
+                imageSource = "./_images/hb/" + game.title + ".avif";
                 break;
-            case game.image && avifSupport:
-                imageSource = "https://obliteration.net/_images/games/" + game.code + ".avif";
+            case game.image && avifSupport && game.type === "GAME":
+                imageSource = "./_images/games/" + game.code + ".avif";
+                break;
+
+            case (!game.image || !avifSupport) && game.type === "HB":
+                imageText = "HOME<br>BREW";
+                break;
+
+            case (!game.image || !avifSupport) && game.type === "GAME":
+                imageText = "GAME";
                 break;
         }
 
-        if (game.type === "GAME") {
-            imageText = "GAME";
-            
-        } else if (game.type === "HB") {
-            imageText = "HOME<br>BREW";
-
-        } else if (game.type === "SYS") {
-            imageText = "SYSTEM";
-            imageTextSize = 1.13;
-        }
-
+        // makes the game cards have the correct "form" (aka rounding of the edges)
         switch (true) {
-            case totalIssues === 1 :
+            case totalCurrentIssues === 1 :
                 cardType = "gameCard";
                 break;
             case currentIssue === 1 :
                 cardType = "gameCardS";
                 break;
-            case currentIssue === totalIssues :
+            case currentIssue === totalCurrentIssues :
                 cardType = "gameCardE";
                 break;
         }
 
-        // game cards
+        let last_updated = new Date(game.updated).toLocaleDateString();
+
+        // game cards html
         const gameElementHTML = `
-            <a class="${cardType ? cardType : `gameCard`} ${game.tag}" target="_blank" href="https://github.com/obhq/compatibility/issues/${game.id}">
+            <a class="${cardType ? cardType : `gameCard`} ${game.tag}" target="_blank" rel="noopener" href="https://github.com/obhq/compatibility/issues/${game.id}">
                 ${imageSource ? `<img class="gameCardImage" loading="lazy" alt="${game.title} - ${game.code} game image" src="${imageSource}">` : `<p class='gameCardImageText' style='font-size: ${imageTextSize}rem;'>${imageText}</p>`}
                 <div class="gameContent">
                     <p class="gameCardTitle">${game.title}</p>
                     <p class="gameCardCode">${game.code}</p>
                     <p class="gameCardTag">${game.tag}</p>
-                    <p class="gameCardUpdated">${game.updated}</p>
+                    <p class="gameCardUpdated">${last_updated}</p>
                 </div>
             </a>`;
 
@@ -260,13 +266,20 @@ function gameCardHandler(jsonData) {
 
         gameWrapper.appendChild(tempContainer.firstElementChild);
     });
-    
 
-    // TODO fix with sliced
-    if (totalIssues === 0) {
+    // updates the results found text on the bottom
+    if (totalCurrentIssues === 0) {
         document.getElementById("infoText").innerText = `No results found!`;
+
+        // adds the NoResultFound message. Also, why the fuck do I need to put two "\", like why??? I NEED ANSWERS
+        gameWrapper.innerHTML = `
+        <div class="noResultsFound">
+            <span class="noResultsFoundText">No Results found</span>
+            <span class="noResultsFoundEmoji">¯\\_(ツ)_/¯</span>
+        </div>`;
+        
     } else {
-        document.getElementById("infoText").innerText = `${totalIssues} results found`;
+        document.getElementById("infoText").innerText = `${issuesCount} results found`;
     }
 
     // Fixes the page jumping when the last page doesn't have 10 issues
@@ -276,17 +289,20 @@ function gameCardHandler(jsonData) {
 }
 
 
-function PageSelector(state) {
+// updates the values of the page selector and handles the changing of the page number
+function PageSelectorUpdater(state) {
     const minNumberElement = document.getElementById("pageSelectorMin");
     const maxNumberElement = document.getElementById("pageSelectorMax");
     const pageSearchElement = document.getElementById("pageSelectorSearch");
 
-    console.log(state);
     let oldPage = currentPage;
 
     switch (state) {
         case "search":
-            currentPage = parseInt(pageSearchElement.value);
+            if (!isNaN(parseInt(pageSearchElement.value))) {
+                currentPage = parseInt(pageSearchElement.value);
+            }
+
             pageSearchElement.value = "";
             break;
         case "min":
@@ -328,18 +344,25 @@ function PageSelector(state) {
     if (!(currentPage === oldPage)) {
         updateSearchResults();
     }
-    
-    
-    minNumberElement.innerText = "1";
+
+    // if there are no search results, set the minNumberElement to 0
+    if (totalPages === 0) {
+        minNumberElement.innerText = "0";
+    } else {
+        minNumberElement.innerText = "1";
+    }
+
     maxNumberElement.innerText = totalPages;
 }
 
+
+// gets called when the onInput is called on the page selector "search bar"
 function OnPageSelectorSearch() {
     clearTimeout(Timer);
 
     Timer = setTimeout(() => {
 
-        PageSelector("search");
+        PageSelectorUpdater("search");
 
     }, 700);
 }

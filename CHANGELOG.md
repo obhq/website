@@ -5,7 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### [v0.1.0] [unreleased]
+### [v0.2.0] (unreleased)
+
+#### Added
+
+- Comp List
+    - Added mobile support
+    - Added comments to the javascript code
+
+#### Changed
+
+- General
+    - Did **a lot of** cleanup and bug fixes with the rust updater script
+- Main Page
+    - Improved mobile support
+    - Smoll styling changes
+- Comp List
+    - Check if the page search bar contains a number
+    - fixed `minNumberElement` displaying that there is a page while there isn't
+    - fixed `x results found` text to display the correct number
+    - fixed css browser compatibility
+    - removed unused css
+    - Moved color accents to `required.css`
+    - Made `updated_date` automatically change time format based on the user
+- Updater Script
+    - Fixed `game_skips.json` not getting saved
+    - Made homebrew database updater into a separate function
+    - Changed the last_updated string into `rfc3339` format
+    - Tidied up the code for getting the `status_tag`, `code`, and `issue_type`
+    - Improved error handling
+    - Merged the two config classes into one
+    - Fixed folder creation
+    - Updated the config
+    - Fixed direction of issues being flipped
+
+### [v0.1.0] (unreleased)
 
 #### Added
 

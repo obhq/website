@@ -1,16 +1,18 @@
 document.addEventListener('DOMContentLoaded', async function () {
     // required.js
     adjustScreenSize(); // might not change the top image for on mobile
-    
-    await init();
-    adjustScreenSize(); // ensure change of top image
-    headerShadow();
-    animationHandler();
 
-    window.addEventListener('resize', adjustScreenSize);
+    await init();
+    adjustScreenSize(700); // ensure change of top image
+    headerShadow();
+    animationHandler(700);
+
+    window.addEventListener('resize', () => {
+        adjustScreenSize(700);
+    });
     window.addEventListener("scroll", headerShadow);
 
-    
+
     await fetch('/stats.json').then(response => response.json()).then(jsonData => {
         countingAnimation(jsonData.stars, document.getElementById("starsNumber"));
         countingAnimation(jsonData.issues, document.getElementById("issuesNumber"));

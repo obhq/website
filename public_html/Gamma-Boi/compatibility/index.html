@@ -47,40 +47,40 @@
         <div class="compMenuStatusWrap Playable" id="PlayableStatus">
             <span class="compMenuStatusLabel">Playable</span>
             <span class="compMenuStatusInfo NoOpacity"></span>
-            <span class="gameMenuStatusAmount"></span>
-            <div class="gameMenuStatusBar NoOpacity"></div>
+            <span class="compMenuStatusAmount"></span>
+            <div class="compMenuStatusBar NoOpacity"></div>
         </div>
 
         <div class="compMenuStatusWrap InGame" id="InGameStatus">
             <span class="compMenuStatusLabel">InGame</span>
             <span class="compMenuStatusInfo NoOpacity"></span>
-            <span class="gameMenuStatusAmount"></span>
-            <div class="gameMenuStatusBar NoOpacity"></div>
+            <span class="compMenuStatusAmount"></span>
+            <div class="compMenuStatusBar NoOpacity"></div>
         </div>
 
         <div class="compMenuStatusWrap Intro" id="IntroStatus">
             <span class="compMenuStatusLabel">Intro</span>
             <span class="compMenuStatusInfo NoOpacity"></span>
-            <span class="gameMenuStatusAmount"></span>
-            <div class="gameMenuStatusBar NoOpacity"></div>
+            <span class="compMenuStatusAmount"></span>
+            <div class="compMenuStatusBar NoOpacity"></div>
         </div>
 
         <div class="compMenuStatusWrap Boots" id="BootsStatus">
             <span class="compMenuStatusLabel">Boots</span>
             <span class="compMenuStatusInfo NoOpacity"></span>
-            <span class="gameMenuStatusAmount"></span>
-            <div class="gameMenuStatusBar NoOpacity"></div>
+            <span class="compMenuStatusAmount"></span>
+            <div class="compMenuStatusBar NoOpacity"></div>
         </div>
 
         <div class="compMenuStatusWrap Nothing" id="NothingStatus">
             <span class="compMenuStatusLabel">Nothing</span>
             <span class="compMenuStatusInfo NoOpacity"></span>
-            <span class="gameMenuStatusAmount"></span>
-            <div class="gameMenuStatusBar NoOpacity"></div>
+            <span class="compMenuStatusAmount"></span>
+            <div class="compMenuStatusBar NoOpacity"></div>
         </div>
 
         <label>
-            <input autocomplete="off" type="text" name="obliteration" class="gameMenuSearchBar" placeholder="GAME TITLE / ID" id="gameSearch" oninput="OnGameMenuSearch()">
+            <input autocomplete="off" type="text" name="obliteration" class="compMenuSearchBar" placeholder="GAME TITLE / ID" id="gameSearch" oninput="OnCompMenuSearch()">
         </label>
 
     </div>
@@ -112,17 +112,16 @@
     <div class="endMenu">
 
         <div class="pageBarContainer">
-            <img class="pageBarImage" alt="Arrow pointing Backwards" src="/_images/arrow_forward.svg" style="rotate: 180deg" onclick="PageSelector('less')">
-            <p class="pageBarText" id="pageSelectorMin" onclick="PageSelector('min')"></p>
+            <img class="pageBarImage pageBarImageR" alt="Arrow pointing Backwards" src="/_images/arrow_forward.svg" onclick="PageSelectorUpdater('less')">
+            <p class="pageBarText" id="pageSelectorMin" onclick="PageSelectorUpdater('min')"></p>
             <label>
                 <input autocomplete="off" type="number" min="1" name="obliteration" class="pageBarSearch" placeholder="..." id="pageSelectorSearch" oninput="OnPageSelectorSearch()">
             </label>
-            <p class="pageBarText" id="pageSelectorMax" onclick="PageSelector('max')"></p>
-            <img class="pageBarImage" alt="Arrow pointing Forwards" src="/_images/arrow_forward.svg" onclick="PageSelector('more')">
+            <p class="pageBarText" id="pageSelectorMax" onclick="PageSelectorUpdater('max')"></p>
+            <img class="pageBarImage" alt="Arrow pointing Forwards" src="/_images/arrow_forward.svg" onclick="PageSelectorUpdater('more')">
         </div>
 
         <h4 class="endMenuInfoText" id="infoText">Fetching Results</h4>
-        <!--        <h4>page selector here :3</h4>-->
     </div>
 </main>
 </body>
