@@ -4,14 +4,15 @@ use rusqlite::Connection;
 use serde::Serialize;
 use serde_json::Value;
 
-use crate::config::Config;
+use crate::{eprintln_red, println_cyan, println_green};
+use crate::config::{Config, Secrets};
 
-pub enum ImageTypes<'lt> {
+pub(crate) enum ImageTypes<'lt> {
     Game(&'lt str, String, &'lt String, &'lt String),
     Hb(&'lt str, String, &'lt Connection, &'lt String),
 }
 
-pub fn image_handler(image_type: ImageTypes) -> Result<(), anyhow::Error> {
+pub(crate) fn image_handler(image_type: ImageTypes) -> Result<(), anyhow::Error> {
     use hmac::{Hmac, Mac};
     use sha1::Sha1;
     use hex::FromHex;
@@ -102,7 +103,7 @@ struct StatsJson {
     devbuilds: String,
 }
 
-pub fn stats_creator(path: &str, token: &str, github_main: &str, github_comp: &str, workflow: &str) -> Result<(), anyhow::Error> {
+pub(crate) fn stats_creator(path: &str, token: &str, github_main: &str, github_comp: &str, workflow: &str) -> Result<(), anyhow::Error> {
     use crate::github_request;
 
     let stars = github_request(github_main, token)
@@ -136,7 +137,7 @@ pub fn stats_creator(path: &str, token: &str, github_main: &str, github_comp: &s
     Ok(())
 }
 
-pub fn homebrew_database_updater(config: &Config) -> Result<(), anyhow::Error> {
+pub(crate) fn homebrew_database_updater(config: &Config, secrets: &Secrets) -> Result<(), anyhow::Error> {
     use md5::{Digest, Md5};
     use chrono::{Timelike, Utc};
     use hex::encode;
@@ -149,7 +150,7 @@ pub fn homebrew_database_updater(config: &Config) -> Result<(), anyhow::Error> {
     // Checks if homebrew database is up-to-date
     if !(4..=57).contains(&minute) || !Path::new(&config.homebrew_database).exists() {
         let hash_response = ureq::get("https://api.pkg-zone.com/api.php?db_check_hash=true")
-            .set("User-Agent", &config.homebrew_token)
+            .set("User-Agent", &secrets.homebrew_api_token)
             .call()?;
 
         let new_hash: String = {
@@ -165,35 +166,27 @@ pub fn homebrew_database_updater(config: &Config) -> Result<(), anyhow::Error> {
         let local_hash: String = match fs::read(&config.homebrew_database) {
             Ok(file) => encode(Md5::digest(file)),
             Err(err) => {
-                println!("Homebrew Database not found: {}", err);
+                eprintln_red!("Homebrew Database not found: {}", err);
                 "0".to_string()
             }
         };
 
         // Compares the current hash with the new hash
         if new_hash == local_hash {
-            println!("Homebrew Database is up-to-date!");
+            println_green!("Homebrew Database is up-to-date!");
         } else {
-            println!(
-                "MD5Hash: {} => {} \nUpdating database!",
-                local_hash, new_hash
-            );
+            println_cyan!("MD5Hash: {local_hash} => {new_hash}");
+            println_cyan!("Updating database!");
 
             // Downloads the new database
             let database_response = ureq::get("https://api.pkg-zone.com/store.db")
-                .set("User-Agent", &config.homebrew_token)
+                .set("User-Agent", &secrets.homebrew_api_token)
                 .call()?;
 
             let mut file = File::create(&config.homebrew_database).expect("failed to create file");
+            std::io::copy(&mut database_response.into_reader(), &mut file)?;
 
-            match std::io::copy(&mut database_response.into_reader(), &mut file) {
-                Ok(_) => {
-                    println!("Saved database in: \"{}\" Successfully!", &config.homebrew_database);
-                }
-                Err(err) => {
-                    panic!("Aborting, error saving homebrew database: {}", err)
-                }
-            };
+            println_cyan!("Saved Database In: \"{}\" Successfully!", &config.homebrew_database)
         }
     }
     Ok(())

@@ -2,7 +2,6 @@
 
 let menuState = true;
 let Timer = 0;
-// let url_prefix = "/obhqWebsite/public_html/Gamma-Boi"
 let avifSupport;
 
 // Adjust screen size for mobile and 4k monitors for some reason
@@ -116,9 +115,9 @@ async function init() {
                 <img id="headerIcon" src="/_images/Obliteration.avif" height="40px" width="auto" alt="Obliteration logo">
             </a>
             <div class="headerRight NoOpacity">
-                <a class="headerLink" href="./download">Download</a>
-                <a class="headerLink" href="./compatibility">Compatibility</a>
-                <a class="headerLink" href="./wiki">Wiki</a>
+                <a class="headerLink" href="/download">Download</a>
+                <a class="headerLink" href="/compatibility">Compatibility</a>
+                <a class="headerLink" href="/wiki">Wiki</a>
                 <div class="headerRightIcons">
                     <a href="https://github.com/obhq/obliteration" target="_blank" rel="noopener" style="display: flex;">
                         <img class="headerRightIconGithub" src="/_images/github.svg" alt="GitHub logo">
@@ -134,9 +133,9 @@ async function init() {
     let menu_html = `
         <div class="menuContainer NoOpacity" id="menu" onclick="menuButton()">
             <div class="menu">
-                <a class="menuLink" href="./download">Download</a>
-                <a class="menuLink" href="./compatibility">Compatibility</a>
-                <a class="menuLink" href="https://github.com/obhq/obliteration/wiki">Wiki</a>
+                <a class="menuLink" href="/download">Download</a>
+                <a class="menuLink" href="/compatibility">Compatibility</a>
+                <a class="menuLink" href="/wiki">Wiki</a>
             </div>
         </div>`;
 

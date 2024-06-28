@@ -5,8 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Obliteration - Compatibility List</title>
-    <meta name="description" content="Obliteration is an experimental open-source PS4 emulator written in Rust for Windows, MacOS, and Linux.">
-    <meta name="keywords" content="Obliteration, playstation, ps4, playstation 4, emulator, windows, macOS, linux, open-source, rust, C++, obliteration github, obliteration discord, obliteration wiki">
+    <meta name="description"
+          content="Obliteration is an experimental open-source PS4 emulator written in Rust for Windows, MacOS, and Linux.">
+    <meta name="keywords"
+          content="Obliteration, playstation, ps4, playstation 4, emulator, windows, macOS, linux, open-source, rust, C++, obliteration github, obliteration discord, obliteration wiki">
     <meta name="robots" content="index,follow">
     <meta name="author" content="Obliteration">
     <meta name="copyright" content="Obliteration">
@@ -23,10 +25,10 @@
     <link rel="preconnect" href="https://rsms.me/">
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
     <link rel="stylesheet" href="/required.css">
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="styles.css">
     <meta name="darkreader-lock"> <!-- for disabling dark mode with dark reader -->
     <script defer src="/required.js"></script>
-    <script defer src="./app.js"></script>
+    <script defer src="app.js"></script>
 </head>
 <body>
 <header class="header" id="header"></header>
@@ -42,7 +44,7 @@
     <div class="compMenu">
         <p class="compMenuText1">Compatibility List</p>
         <p class="compMenuStuffText">These are the currently tested games and applications on Obliteration.<br>
-                                     Clicking on a card will redirect you to the GitHub issue.</p>
+            Clicking on a card will redirect you to the GitHub issue.</p>
 
         <div class="compMenuStatusWrap Playable" id="PlayableStatus">
             <span class="compMenuStatusLabel">Playable</span>
@@ -80,7 +82,8 @@
         </div>
 
         <label>
-            <input autocomplete="off" type="text" name="obliteration" class="compMenuSearchBar" placeholder="GAME TITLE / ID" id="gameSearch" oninput="OnCompMenuSearch()">
+            <input autocomplete="off" type="text" name="obliteration" class="compMenuSearchBar"
+                   placeholder="GAME TITLE / ID" id="gameSearch" oninput="OnCompMenuSearch()">
         </label>
 
     </div>
@@ -112,13 +115,16 @@
     <div class="endMenu">
 
         <div class="pageBarContainer">
-            <img class="pageBarImage pageBarImageR" alt="Arrow pointing Backwards" src="/_images/arrow_forward.svg" onclick="PageSelectorUpdater('less')">
+            <img class="pageBarImage pageBarImageR" alt="Arrow pointing Backwards" src="/_images/arrow_forward.svg"
+                 onclick="PageSelectorUpdater('less')">
             <p class="pageBarText" id="pageSelectorMin" onclick="PageSelectorUpdater('min')"></p>
             <label>
-                <input autocomplete="off" type="number" min="1" name="obliteration" class="pageBarSearch" placeholder="..." id="pageSelectorSearch" oninput="OnPageSelectorSearch()">
+                <input autocomplete="off" type="number" min="1" name="obliteration" class="pageBarSearch"
+                       placeholder="..." id="pageSelectorSearch" oninput="OnPageSelectorSearch()">
             </label>
             <p class="pageBarText" id="pageSelectorMax" onclick="PageSelectorUpdater('max')"></p>
-            <img class="pageBarImage" alt="Arrow pointing Forwards" src="/_images/arrow_forward.svg" onclick="PageSelectorUpdater('more')">
+            <img class="pageBarImage" alt="Arrow pointing Forwards" src="/_images/arrow_forward.svg"
+                 onclick="PageSelectorUpdater('more')">
         </div>
 
         <h4 class="endMenuInfoText" id="infoText">Fetching Results</h4>

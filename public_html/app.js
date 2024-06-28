@@ -1,33 +1,53 @@
-// Adjust screen size for mobile and 4k monitors for some reason
-function adjustScreenSize() {
-    let screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-    let referenceWidth = 1920;
-    let referenceFontSize = 16;
-    let phoneReferenceWidth = 720;
+document.addEventListener('DOMContentLoaded', async function () {
+    // required.js
+    adjustScreenSize(); // might not change the top image for on mobile
 
-    // document.documentElement.style.width = "";
-    if (screenWidth >= referenceWidth) { // 2000 ++
-        let fontSize = (screenWidth / referenceWidth) * referenceFontSize;
-        document.documentElement.style.fontSize = fontSize + 'px';
+    await init();
+    adjustScreenSize(700); // ensure change of top image
+    headerShadow();
+    animationHandler(700);
 
-    } else if (screenWidth >= phoneReferenceWidth) { // 720 - 2000
-        document.documentElement.style.fontSize = referenceFontSize + 'px';
+    window.addEventListener('resize', () => {
+        adjustScreenSize(700);
+    });
+    window.addEventListener("scroll", headerShadow);
 
-    } else { // -- 720
-        let fontSize = (screenWidth / phoneReferenceWidth) * referenceFontSize;
-        //   document.documentElement.style.width = screenWidth + "px";
-        let viewport = document.querySelector('meta[name="viewport"]');
-        viewport.content = "initial-scale=1";
-        document.documentElement.style.fontSize = fontSize + 'px';
-    }
 
-    if (screenWidth < "370") {
-        document.getElementById("headerIcon").src = "/_images/Obliteration-smoll.png";
-    } else {
-        document.getElementById("headerIcon").src = "/_images/Obliteration.png";
-    }
+    await fetch('stats.json').then(response => response.json()).then(jsonData => {
+        countingAnimation(jsonData.stars, document.getElementById("starsNumber"));
+        countingAnimation(jsonData.issues, document.getElementById("issuesNumber"));
+        countingAnimation(jsonData.devbuilds, document.getElementById("devbuildsNumber"));
+    });
+
+    setTimeout(() => {
+        document.querySelectorAll(".tableNumbersContainer").forEach(element => {
+            element.style.transition = "none";
+        });
+    }, 1900); // timed with the transition speed in css
+});
+
+function buttonScroll() {
+    const targetElement = document.getElementById('main2');
+    targetElement.scrollIntoView({behavior: 'smooth'});
 }
 
-// Adjust screen size for mobile and 4k monitors for some reason
-window.addEventListener('load', adjustScreenSize);
-window.addEventListener('resize', adjustScreenSize);
+
+function countingAnimation(number, element) {
+    const digits = number.toString().split("");
+
+    digits.forEach(digit => {
+        let spanList = '';
+
+        for (let i = 0; i < 10; i++) {
+            spanList += `<span class="midText text-themed">${i}</span>`;
+        }
+
+        element.innerHTML += `<span class="tableNumbersContainer" style="transform: translateY(-1000%)">${spanList}`;
+    });
+
+    setTimeout(() => {
+        element.querySelectorAll('.tableNumbersContainer').forEach((e, i) => {
+            e.style.transform = `translateY(-${100 * parseInt(digits[i])}%)`;
+        });
+    }, 100)
+}

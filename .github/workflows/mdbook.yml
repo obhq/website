@@ -1,0 +1,57 @@
+# Automatically updates the mdbook on build
+
+name: mdbook updater
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - mdbook/**
+  workflow_dispatch:
+    inputs:
+      manual:
+        description: Manually updates the mdbook!
+
+defaults:
+  run:
+    working-directory: mdbook/
+
+jobs:
+  build:
+    name: mdbook updater
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: setup rust
+        run: |
+          rustup update stable
+          rustup default stable
+
+      - name: install mdbook
+        run: cargo install mdbook
+
+      - name: build mdbook
+        run: |
+          mdbook build --dest-dir /home/runner/work/obhqWebsite/temp/wiki/
+
+      - name: Commit and push changes to gh-pages
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages
+          git switch gh-pages --force
+          rm -r -f /home/runner/work/obhqWebsite/obhqWebsite/wiki/
+          mv -f /home/runner/work/obhqWebsite/temp/wiki/ /home/runner/work/obhqWebsite/obhqWebsite/wiki/
+          git add /home/runner/work/obhqWebsite/obhqWebsite/wiki/
+          
+          files_to_commit=$(git status --porcelain | grep -E 'M|A|D' | wc -l)
+          if [ $files_to_commit -gt 0 ]; then
+            echo "Committing changes!"
+            git fetch origin gh-pages
+            git commit -m "Automatic mdbook Update"
+            git push origin gh-pages
+          else
+            echo "No changes to commit."
+          fi

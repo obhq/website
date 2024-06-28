@@ -1,0 +1,55 @@
+name: public_html update
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - public_html/**
+  workflow_dispatch:
+    inputs:
+      manual:
+        description: Manually updates the public_html!
+
+jobs:
+  build:
+    name: public_html Updater
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: Copy files
+        run: |
+          mkdir -p /home/runner/work/obhqWebsite/temp/public_html/
+          cp -a -r -f /home/runner/work/obhqWebsite/obhqWebsite/public_html/* /home/runner/work/obhqWebsite/temp/public_html/
+
+      - name: Commit and push changes to gh-pages
+        run: |
+          # Switch to gh-pages
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages
+          git switch gh-pages --force
+          
+          # put the new files into the folder
+          rm -r -f /home/runner/work/obhqWebsite/obhqWebsite/*
+          mv -f /home/runner/work/obhqWebsite/temp/public_html/* /home/runner/work/obhqWebsite/obhqWebsite/
+          touch /home/runner/work/obhqWebsite/obhqWebsite/.nojekyll
+          git add /home/runner/work/obhqWebsite/obhqWebsite/ -f
+          
+          # restore files that dont need updating
+          git restore --staged --worktree wiki/
+          git restore --staged --worktree compatibility/_images/games/
+          git restore --staged --worktree compatibility/_images/hb/
+          git restore --staged --worktree compatibility/database.json
+          git restore --staged --worktree stats.json
+          
+          files_to_commit=$(git status --porcelain | grep -E 'M|A|D' | wc -l)
+          if [ $files_to_commit -gt 0 ]; then
+            echo "Committing changes!"
+            git fetch origin gh-pages
+            git commit -m "Automatic public_html update"
+            git push origin gh-pages
+          else
+            echo "No changes to commit."
+          fi

@@ -9,5 +9,5 @@ src = "src"
 edition = "2018"
 
 [build]
-build-dir = 'D:\Website\public_html\Gamma-Boi\wiki'
-create-missing = false
+build-dir = '/home/runner/work/obhqWebsite/temp/wiki/'
+create-missing = true

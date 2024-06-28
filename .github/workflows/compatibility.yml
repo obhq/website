@@ -1,0 +1,113 @@
+# Automatically update the database when an issue in the compatibility repo gets updated
+
+name: Compatibility List Updater
+on:
+  issues:
+    types:
+      - opened
+      - labeled
+      - edited
+      - closed
+      - deleted
+    repositories:
+      - obhq/compatibility
+  workflow_dispatch:
+    inputs:
+      manual:
+        description: Manually updates the database!
+
+env:
+  CARGO_TERM_COLOR: always
+  GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  HOMEBREW_API_TOKEN: ${{ secrets.HOMEBREW_API_TOKEN }}
+  TMDB_HEX: ${{ secrets.TMDB_HEX }}
+
+defaults:
+  run:
+    working-directory: updater/
+
+jobs:
+  build:
+    name: obhqWebsite_database_updater
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: setup rust
+        run: |
+          rustup update stable
+          rustup default stable
+
+      - name: restore old images && database
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages
+          git switch gh-pages --force
+          mkdir -p /home/runner/work/obhqWebsite/temp/updater/images/
+          
+          # if there are images, copy em over
+          if [ -d /home/runner/work/obhqWebsite/obhqWebsite/compatibility/_images/ ]; then
+            echo "Copying Images"
+            cp -a -r -f /home/runner/work/obhqWebsite/obhqWebsite/compatibility/_images/* /home/runner/work/obhqWebsite/temp/updater/images/
+          fi
+          
+          # if there is an old main db, copy it over
+          if [ -f /home/runner/work/obhqWebsite/obhqWebsite/compatibility/database.json ]; then
+            echo "Copying Old Database"
+            cp -a -r -f /home/runner/work/obhqWebsite/obhqWebsite/compatibility/database.json /home/runner/work/obhqWebsite/temp/updater/database.json
+          fi
+          
+          git fetch origin main
+          git switch main --force
+
+      - name: run obhqWebsite_database_updater
+        run: cargo run --release
+
+      - name: Commit and push changes to main
+        run: |
+          git fetch origin main
+          git add game_skips.json -f
+          git add HBstore.db -f
+          git add config/config.toml -f
+          
+          files_to_commit=$(git status --porcelain | grep -E 'M|A|D' | wc -l)
+          if [ $files_to_commit -gt 0 ]; then
+            echo "Committing changes!"
+            git fetch origin main
+            git commit -m "Automatic Compatibility List Update"
+            git push origin main
+          else
+            echo "No changes to commit."
+          fi
+
+
+      - name: Commit and push changes to gh-pages
+        run: |
+          git fetch origin gh-pages
+          git switch gh-pages --force
+          mkdir -p /home/runner/work/obhqWebsite/obhqWebsite/compatibility/_images/
+          
+          rm -r -f /home/runner/work/obhqWebsite/obhqWebsite/compatibility/_images/games/
+          rm -r -f /home/runner/work/obhqWebsite/obhqWebsite/compatibility/_images/hb/
+          rm -f /home/runner/work/obhqWebsite/obhqWebsite/compatibility/database.json
+          rm -f /home/runner/work/obhqWebsite/obhqWebsite/stats.json
+          
+          mv -f /home/runner/work/obhqWebsite/temp/updater/images/* /home/runner/work/obhqWebsite/obhqWebsite/compatibility/_images/
+          mv -f /home/runner/work/obhqWebsite/temp/updater/database.json /home/runner/work/obhqWebsite/obhqWebsite/compatibility/database.json
+          mv -f /home/runner/work/obhqWebsite/temp/updater/stats.json /home/runner/work/obhqWebsite/obhqWebsite/stats.json
+          
+          git add /home/runner/work/obhqWebsite/obhqWebsite/stats.json -f
+          git add /home/runner/work/obhqWebsite/obhqWebsite/compatibility/database.json -f
+          git add /home/runner/work/obhqWebsite/obhqWebsite/compatibility/_images/ -f
+          
+          files_to_commit=$(git status --porcelain | grep -E 'M|A|D' | wc -l)
+          if [ $files_to_commit -gt 0 ]; then
+            echo "Committing changes!"
+            git fetch origin gh-pages
+            git commit -m "Automatic Compatibility List Update"
+            git push origin gh-pages
+          else
+            echo "No changes to commit."
+          fi

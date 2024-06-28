@@ -7,11 +7,12 @@ use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::config::{Config, config_creator};
+use crate::config::config_creator;
 use crate::utils::homebrew_database_updater;
 
 mod utils;
 mod config;
+mod macros;
 
 #[derive(Serialize, Deserialize)]
 struct Issue {
@@ -25,29 +26,29 @@ struct Issue {
 }
 
 fn main() {
-    println!("1/4 : Reading config :3");
+    println_green!("1/4 : Reading Config :3");
     let start_time = Instant::now();
 
     let mut failed_images: u64 = 0;
     let code_regex = Regex::new(r"[a-zA-Z]{4}[0-9]{5}").unwrap();
 
-    let config: Config = config_creator();
+    let (config, secrets) = match config_creator() {
+        Ok(data) => data,
+        Err(err) => panic_red!("Error getting config data, Aborting! || Err: {}", err.root_cause()),
+    };
 
-    println!("2/4 : Initializing Databases :3");
+    println_green!("2/4 : Initializing Databases :3");
 
-    match homebrew_database_updater(&config) {
-        Ok(..) => (),
-        Err(err) => {
-            if !Path::new(&config.homebrew_database).exists() {
-                panic!("Error downloading database and couldn't find the file locally.\nError:{}", err.root_cause());
-            } else {
-                eprintln!("Couldnt update the homebrew database, however a local copy was found, continuing.\n Error: {}", err.root_cause());
-            }
+    homebrew_database_updater(&config, &secrets).unwrap_or_else(|err| {
+        if !Path::new(&config.homebrew_database).exists() {
+            panic_red!("Error downloading database and couldn't find the file locally. || Error: {}", err.root_cause());
+        } else {
+            eprintln_red!("Couldnt update the homebrew database, however a local copy was found, continuing. ||  Error: {}", err.root_cause());
         }
-    }
+    });
 
     // Setup databases
-    let database_hb = Connection::open(&config.homebrew_database).expect("Failed to open SQLite connection");
+    let database_hb = Connection::open(&config.homebrew_database).expect("Failed to open SQLite connection to homebrew database!");
 
     let mut new_issues: Vec<Issue> = Vec::new();
 
@@ -69,19 +70,19 @@ fn main() {
         }
     };
 
-    println!("3/4 : Starting Database Update :3");
+    println_green!("3/4 : Starting Main Database Update :3");
 
     // gets the total pages
     let page_count: u64 = {
-        let total_issues: u64 = github_request(&config.compat_api_url, &config.github_api_token)
+        let total_issues: u64 = github_request(&config.compat_api_url, &secrets.github_api_token)
             .get("open_issues_count")
             .and_then(Value::as_u64)
             .expect("Failed to parse JSON o.o!");
 
         let total_pages: u64 = total_issues.div_ceil(100);
 
-        println!("Total Issues: {}", total_issues);
-        println!("Total Pages: {}", total_pages);
+        println_cyan!("Total Issues: {}", total_issues);
+        println_cyan!("Total Pages: {}", total_pages);
         total_pages
     };
 
@@ -94,7 +95,7 @@ fn main() {
             );
 
             // need to clone otherwise it is a reference -.-
-            github_request(url.as_str(), &config.github_api_token)
+            github_request(url.as_str(), &secrets.github_api_token)
                 .as_array()
                 .cloned()
                 .unwrap()
@@ -186,7 +187,7 @@ fn main() {
 
                     // the rest will not be processed further
                 } else {
-                    eprintln!("Skipped: {:?} + {:?}", title, code);
+                    eprintln_red!("Skipped: {:?} + {:?}", title, code);
                     continue;
                 }
             };
@@ -195,7 +196,7 @@ fn main() {
                 "GAME" => format!("{}{}.avif", &config.game_images_folder, &code),
                 "HB" => format!("{}{}.avif", &config.homebrew_images_folder, &title),
                 _ => {
-                    eprintln!("Skipped: {:?} + {:?}", title, code);
+                    eprintln_red!("Skipped: {:?} + {:?}", title, code);
                     continue;
                 }
             };
@@ -211,11 +212,11 @@ fn main() {
                         &config.ps4_useragent,
                         image_path,
                         &code,
-                        &config.tmdb_hex,
+                        &secrets.tmdb_hex,
                     )) {
                         Ok(_) => image_exists = true,
                         Err(err) => {
-                            eprintln!("Image download failed! {}", err.root_cause());
+                            eprintln_red!("Image Download Failed! || {}", err.root_cause());
                             failed_images += 1;
 
                             game_skips.push(id);
@@ -229,14 +230,14 @@ fn main() {
                 // check if the id is in the skip table
                 if !game_skips.contains(&id) {
                     match utils::image_handler(utils::ImageTypes::Hb(
-                        &config.homebrew_token,
+                        &secrets.homebrew_api_token,
                         image_path,
                         &database_hb,
                         &title,
                     )) {
                         Ok(_) => image_exists = true,
                         Err(err) => {
-                            eprintln!("Image download failed! {}", err.root_cause());
+                            eprintln_red!("Image Download Failed! || {}", err.root_cause());
                             failed_images += 1;
 
                             game_skips.push(id);
@@ -250,11 +251,6 @@ fn main() {
             }
 
             // put issue into new_issues
-            //println!(
-            //    "{} : {} [{}] - {}, {}   {}",
-            //    &id, &title, &code, &issue_type, &status_tag, &last_updated
-            //);
-
             new_issues.push(Issue {
                 id,
                 code,
@@ -265,7 +261,7 @@ fn main() {
                 image: image_exists,
             });
         }
-        println!(
+        println_cyan!(
             "Page {} in: {}ms",
             page,
             (Instant::now() - page_time).as_millis()
@@ -273,7 +269,7 @@ fn main() {
     }
 
 
-    println!("3/3 : Starting Database transfer :3");
+    println_green!("3/3 : Starting Database Transfer :3");
 
     // save the game_skips.json
     let game_skips_json = serde_json::to_string(&game_skips).expect("Uh oh! Error creating the json string!");
@@ -282,31 +278,33 @@ fn main() {
     let new_issues_count: f64 = new_issues.len() as f64;
     let old_issues_count: f64 = old_issues.len() as f64;
 
-    println!("new: {} : old: {}", new_issues_count, old_issues_count);
+    println_cyan!("New issues count: {} || Old issues count: {}", new_issues_count, old_issues_count);
 
     // remove 5% from old_issues count and see if the new_issues is bigger. this ensures that new_issues isn't fucked somehow
     if new_issues_count > (0.95 * old_issues_count) {
         // save the database
+        println_cyan!("Continuing update!");
+
         let issues_json = serde_json::to_string(&new_issues).expect("Uh oh! Error creating the json database string!");
         fs::write(&config.database, issues_json).expect("Error saving the \"database\" file!");
     } else {
-        eprintln!("Something is wrong with newIssues, skipping update!\n If a lot of issues got removed from the compatibility page then ignore this error and just remove the \"{}\" file!", &config.database);
+        eprintln_red!("Something is wrong with newIssues, skipping update!\n If a lot of issues got removed from the compatibility page then ignore this error and just remove the \"{}\" file!", &config.database);
     }
 
     // create the stats.json
-    match utils::stats_creator(&config.stats_file, &config.github_api_token, &config.main_api_url, &config.compat_api_url, &config.workflow_url) {
+    match utils::stats_creator(&config.stats_file, &secrets.github_api_token, &config.main_api_url, &config.compat_api_url, &config.workflow_url) {
         Ok(_) => (),
-        Err(err) => eprintln!("Error creating the \"{}\" file! {}", &config.stats_file, err),
+        Err(err) => eprintln_red!("Error creating the \"{}\" file! {}", &config.stats_file, err),
     }
 
 
     // Calculate the elapsed time
-    println!(
+    println_green!(
         "Completed update in: {} s",
         (Instant::now() - start_time).as_secs_f32()
     );
 
-    println!("Failed images: {}", failed_images);
+    println_cyan!("Failed images: {}", failed_images);
 }
 
 fn github_request(url: &str, token: &str) -> Value {
@@ -317,6 +315,6 @@ fn github_request(url: &str, token: &str) -> Value {
         .call()
     {
         Ok(response) => response.into_json().expect("Failed to parse JSON"),
-        Err(response) => panic!("Github request failed: {}", response),
+        Err(response) => panic_red!("Github request failed: {}", response),
     }
 }

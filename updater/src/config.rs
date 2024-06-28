@@ -2,14 +2,13 @@ use std::fs;
 
 use serde::{Deserialize, Serialize};
 
+use crate::panic_red;
+
 #[derive(Serialize, Deserialize)]
-pub struct Config {
+pub(crate) struct Config {
     pub compat_api_url: String,
     pub main_api_url: String,
-    pub github_api_token: String,
-    pub homebrew_token: String,
     pub ps4_useragent: String,
-    pub tmdb_hex: String,
     pub workflow_url: String,
 
     pub game_images_folder: String,
@@ -27,8 +26,14 @@ pub struct Config {
     pub tag_nothing: u64,
 }
 
-pub fn config_creator() -> Config {
-    use std::path::Path;
+pub(crate) struct Secrets {
+    pub(crate) github_api_token: String,
+    pub(crate) homebrew_api_token: String,
+    pub(crate) tmdb_hex: String,
+}
+
+pub(crate) fn config_creator() -> anyhow::Result<(Config, Secrets)> {
+    use std::{env, path::Path};
 
     const FOLDER_CONFIG: &str = "./config/";
 
@@ -39,10 +44,7 @@ pub fn config_creator() -> Config {
             let config = Config {
                 compat_api_url: "https://api.github.com/repos/obhq/compatibility".to_string(),
                 main_api_url: "https://api.github.com/repos/obhq/obliteration".to_string(),
-                github_api_token: "".to_string(),
-                homebrew_token: "".to_string(),
                 ps4_useragent: "Mozilla/5.0 (PlayStation; PlayStation 4/11.00) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15".to_string(),
-                tmdb_hex: "".to_string(),
                 workflow_url: "https://api.github.com/repos/obhq/obliteration/actions/workflows/36859008/runs".to_string(),
 
                 game_images_folder: "./images/games/".to_string(),
@@ -61,13 +63,13 @@ pub fn config_creator() -> Config {
             };
 
             // create default config
-            fs::create_dir_all(FOLDER_CONFIG).expect("Error creating folders!");
-            fs::write(&config_file, toml::to_string_pretty(&config).unwrap()).expect("Error creating config!");
+            fs::create_dir_all(FOLDER_CONFIG)?;
+            fs::write(&config_file, toml::to_string_pretty(&config)?)?;
 
-            return config;
+            config
         } else {
-            let toml_content = fs::read_to_string(&config_file).expect("Error reading config");
-            toml::from_str(&toml_content).expect("Error deserializing TOML")
+            let toml_content = fs::read_to_string(&config_file)?;
+            toml::from_str(&toml_content)?
         }
     };
 
@@ -75,35 +77,63 @@ pub fn config_creator() -> Config {
     let game_images_folder = Path::new(&config_data.game_images_folder);
     let homebrew_images_folder = Path::new(&config_data.homebrew_images_folder);
 
-    let database_folder = Path::new(&config_data.database).parent().unwrap();
-    let hb_database_folder = Path::new(&config_data.homebrew_database).parent().unwrap();
-    let game_skips_database_folder = Path::new(&config_data.game_skips_database).parent().unwrap();
-    let stats_file_folder = Path::new(&config_data.stats_file).parent().unwrap();
+    let database_folder = Path::new(&config_data.database).parent().unwrap_or_else(|| {
+        panic_red!("Error while getting the parent folder for: \"{}\"", &config_data.database);
+    });
+
+    let hb_database_folder = Path::new(&config_data.homebrew_database).parent().unwrap_or_else(|| {
+        panic_red!("Error while getting the parent folder for: \"{}\"", &config_data.database);
+    });
+
+    let game_skips_database_folder = Path::new(&config_data.game_skips_database).parent().unwrap_or_else(|| {
+        panic_red!("Error while getting the parent folder for: \"{}\"", &config_data.database);
+    });
+
+    let stats_file_folder = Path::new(&config_data.stats_file).parent().unwrap_or_else(|| {
+        panic_red!("Error while getting the parent folder for: \"{}\"", &config_data.database);
+    });
 
 
     if !game_images_folder.exists() {
-        fs::create_dir_all(game_images_folder).expect("Error creating folders for \"game_image\"!");
+        fs::create_dir_all(game_images_folder)?;
     }
 
     if !homebrew_images_folder.exists() {
-        fs::create_dir_all(homebrew_images_folder).expect("Error creating folders for \"homebrew_image\"!");
+        fs::create_dir_all(homebrew_images_folder)?;
     }
 
     if !database_folder.exists() {
-        fs::create_dir_all(database_folder).expect("Error creating folders for \"database\"!");
+        fs::create_dir_all(database_folder)?;
     }
 
     if !hb_database_folder.exists() {
-        fs::create_dir_all(hb_database_folder).expect("Error creating folders for \"hb_database\"!");
+        fs::create_dir_all(hb_database_folder)?;
     }
 
     if !game_skips_database_folder.exists() {
-        fs::create_dir_all(game_skips_database_folder).expect("Error creating folders for \"game_skips_database\"!");
+        fs::create_dir_all(game_skips_database_folder)?;
     }
 
     if !stats_file_folder.exists() {
-        fs::create_dir_all(stats_file_folder).expect("Error creating folders for \"stats_file\"!");
+        fs::create_dir_all(stats_file_folder)?;
     }
 
-    config_data
+    // get environment values :3
+    let secrets = Secrets {
+        github_api_token: match env::var("GITHUB_API_TOKEN") {
+            Ok(value) => value.to_string(),
+            _ => panic_red!("Error while getting the env variable: \"GITHUB_API_TOKEN\""),
+        },
+        homebrew_api_token: match env::var("HOMEBREW_API_TOKEN") {
+            Ok(value) => value.to_string(),
+            _ => panic_red!("Error while getting the env variable: \"HOMEBREW_API_TOKEN\""),
+        },
+        tmdb_hex: match env::var("TMDB_HEX") {
+            Ok(value) => value.to_string(),
+            _ => panic_red!("Error while getting the env variable: \"TMDB_HEX\""),
+        },
+    };
+
+
+    Ok((config_data, secrets))
 }

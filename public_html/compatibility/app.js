@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     // + fetch issues and set the tag bars
-    fetch('./database.json')
+    fetch('database.json')
         .then(response => response.json())
         .then(jsonData => {
             setTimeout(() => {

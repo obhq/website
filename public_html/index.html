@@ -1,58 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Obliteration</title>
-        <meta name="description" content="Obliteration is an experimental open-source PS4 emulator written inmade for Windows, MacOS, and Linux.">
-        <meta name="keywords" content="Obliteration, playstation, ps4, playstation 4, emulator, windows, macOS, linux, open-source, rust, C++, obliteration github, obliteration discord, obliteration wiki">
-        <meta name="robots" content="index,follow">
-        <meta name="author" content="Obliteration">
-        <meta name="copyright" content="Obliteration">
-        <meta name="theme-color" content="#680600">
-        <meta name="twitter:card" content="summary_large_image"/> 
-        <meta name="twitter:title" content="Obliteration - An experimental open-source PS4 emulator"/> 
-        <meta name="twitter:description" content="Obliteration is an experimental open-source PS4 emulator written in Rust for Windows, macOS and Linux."/> 
-        <meta name="twitter:image:src" content="https://obliteration.net/_images/Obliteration.png"/>
-        <meta property="og:title" content="Obliteration - An experimental open-source PS4 emulator">
-        <meta property="og:description" content="Obliteration is an experimental open-source PS4 emulator written in Rust for Windows, macOS and Linux.">
-        <meta property="og:image" content="https://obliteration.net/_images/Obliteration.png">
-        <meta property="og:url" content="https://obliteration.net">
-        <link rel="icon" href="https://obliteration.net/_images/Obliteration-smoll.png" type="image/png">
-        <link rel="preconnect" href="https://rsms.me/">
-        <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
-        <link rel="stylesheet" href="./styles.css">
-        <meta name="darkreader-lock"> <!-- for disabling dark mode with dark reader -->
-    </head>
-    <body>
-        <header class="header">
-            <a class="headerIcon" href="/">
-                <img id="headerIcon" src="/_images/Obliteration.png" height="40" alt="Full Obliteration Logo">
-            </a>
-            <div class="headerRight">
-                <div class="headerRightIcons">
-                    <a href="https://github.com/obhq/obliteration" target="_blank">
-                        <img class="headerRightIconGithub" src="/_images/github.svg" alt="Github icon"/>
-                    </a>
-                    <a href="https://discord.gg/Qsdaxj6tnH" target="_blank">
-                        <img class="headerRightIconDiscord" src="/_images/discord.svg" alt="Discord icon"/>
-                    </a>
-                </div>
-            </div>
-        </header>
-        <main class="main">
-            <div class="mainBackground">
-                <div class="mainBackground1"></div>
-                <div class="mainBackground2"></div>
-            </div>
-            <div class="mainContent">
-                <p class="mainContentBig">Welcome to <span class="mainContentBig" style="color: #5c0504; text-shadow: 2px 2px 1px #b64045;">Obliteration  - WIP</span></p>
-                <p class="mainContentSmoll mainContentText1">An Experimental <span class="mainContentSmoll" style="color: #5c0504; text-shadow: 2px 2px 1px #b64045;">Playstation™ 4</span> emulator written in Rust for Windows, macOS and Linux!</p>
-                <p class="mainContentSmoll mainContentText2">Full website releasing sometime in the future :3 </p>
-                <p class="mainContentSmoll mainContentText3">- Mr. Snowy  </p>
-            </div> 
-        </main>
-    </body>
-    <script src="./app.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Obliteration</title>
+    <meta name="description"
+          content="Obliteration is an experimental open-source PS4 emulator written in Rust for Windows, MacOS, and Linux.">
+    <meta name="keywords"
+          content="Obliteration, playstation, ps4, playstation 4, emulator, windows, macOS, linux, open-source, rust, C++, obliteration github, obliteration discord, obliteration wiki">
+    <meta name="robots" content="index,follow">
+    <meta name="author" content="Obliteration">
+    <meta name="copyright" content="Obliteration">
+    <meta name="theme-color" content="#680600">
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Obliteration - An experimental open-source PS4 emulator"/>
+    <meta name="twitter:description"
+          content="Obliteration is an experimental open-source PS4 emulator written in Rust for Windows, macOS and Linux."/>
+    <meta name="twitter:image:src" content="/_images/Obliteration.png"/>
+    <meta property="og:title" content="Obliteration - An experimental open-source PS4 emulator">
+    <meta property="og:description"
+          content="Obliteration is an experimental open-source PS4 emulator written in Rust for Windows, macOS and Linux.">
+    <meta property="og:image" content="/_images/Obliteration.png">
+    <meta property="og:url" content="https://obliteration.net">
+    <link rel="icon" href="/_images/Obliteration-smoll.png" type="image/png">
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <link rel="stylesheet" href="/required.css">
+    <link rel="stylesheet" href="styles.css">
+    <meta name="darkreader-lock"> <!-- for disabling dark mode with dark reader -->
+    <script defer src="/required.js"></script>
+    <script defer src="app.js"></script>
+</head>
+<body>
+<header class="header" id="header"></header>
+<div class="menuContainer" id="menu"></div>
+<main class="main">
+    <div class="mainBackground">
+        <div class="mainBackground1"></div>
+        <div class="mainBackground2"></div>
+    </div>
+    <div class="mainContent">
+        <p class="bigText mainText1">Welcome to
+            <span class="bigText text-themed">Obliteration</span>
+        </p>
+        <p class="smollText mainText2">An Experimental
+            <span class="smollText text-themed">Playstation™ 4</span> emulator written in Rust for Windows, macOS and
+            Linux!
+        </p>
+        <table class="mainTable">
+            <tr>
+                <td>
+                    <p class="midText mainTableNumber" id="starsNumber"
+                       style="color: #5c0504; text-shadow: 2px 2px 1px #b64045;"></p>
+                </td>
+                <td>
+                    <p class="midText mainTableNumber" id="issuesNumber"
+                       style="color: #5c0504; text-shadow: 2px 2px 1px #b64045;"></p>
+                </td>
+                <td>
+                    <p class="midText mainTableNumber" id="devbuildsNumber"
+                       style="color: #5c0504; text-shadow: 2px 2px 1px #b64045;"></p>
+                </td>
+            </tr>
+            <tr>
+                <td><p class="smollText">Stars on GitHub!</p></td>
+                <td><p class="smollText">Tested Games!</p></td>
+                <td><p class="smollText">Dev Builds!</p></td>
+            </tr>
+        </table>
+        <div class="mainButtonContainer">
+            <a class="mainButton" onclick="buttonScroll()">Learn More</a>
+            <a class="mainButton" href="/download">Download</a>
+        </div>
+    </div>
+</main>
+
+<div class="main2" id="main2">
+    <div class="main2Content toAnimate">
+        <img class="main2Image" src="https://github.com/obhq/obliteration/raw/main/screenshots.png"
+             alt="Screenshot of Obliteration">
+        <div class="main2Text">
+            <p class="bigText main2Text1">About
+                <span class="bigText" style="color: #5c0504; text-shadow: 2px 2px 1px #b64045;">Obliteration</span>
+            </p>
+            <menu style="margin-left: 1rem; margin-top: 2rem;">
+                <li class="smollText">Made with <span class="smollText"
+                                                      style="color: #5c0504; text-shadow: 2px 2px 1px #b64045;">Rust</span>
+                    for performance and safety.
+                </li>
+                <li class="smollText" style="margin-top: 1rem;">Supports Windows, macOS and Linux.</li>
+                <li class="smollText" style="margin-top: 1rem;">Built-in FTP client to pull the firmware from a PS4.*
+                </li>
+                <li class="smollText" style="margin-top: 1rem;">Built-in GUI for managing your games.</li>
+                <li class="smollText" style="margin-top: 1rem;">Built-in PKG extractor.</li>
+                <li style="font-size: 0.8rem; font-weight: 800;margin-top: 1.5rem; list-style: none;"> * jailbroken ps4
+                    required
+                </li>
+            </menu>
+        </div>
+    </div>
+</div>
+</body>
 </html>
