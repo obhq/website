@@ -26,10 +26,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     }, 1900); // timed with the transition speed in css
 });
 
-function buttonScroll() {
+document.getElementById("buttonScroll").addEventListener('click', () => {
     const targetElement = document.getElementById('main2');
     targetElement.scrollIntoView({behavior: 'smooth'});
-}
+});
 
 
 function countingAnimation(number, element) {

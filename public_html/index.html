@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://rsms.me/; font-src 'self' https://rsms.me/; img-src 'self' data:;" >
     <title>Obliteration</title>
     <meta name="description"
           content="Obliteration is an experimental open-source PS4 emulator written in Rust for Windows, MacOS, and Linux.">
@@ -70,7 +71,7 @@
             </tr>
         </table>
         <div class="mainButtonContainer">
-            <a class="mainButton" onclick="buttonScroll()">Learn More</a>
+            <a class="mainButton" id="buttonScroll">Learn More</a>
             <a class="mainButton" href="/download">Download</a>
         </div>
     </div>
@@ -78,7 +79,7 @@
 
 <div class="main2" id="main2">
     <div class="main2Content toAnimate">
-        <img class="main2Image" src="https://github.com/obhq/obliteration/raw/main/screenshots.png"
+        <img class="main2Image" src="/_images/obliteration-screenshots.png"
              alt="Screenshot of Obliteration">
         <div class="main2Text">
             <p class="bigText main2Text1">About

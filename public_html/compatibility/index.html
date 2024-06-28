@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://rsms.me/; font-src 'self' https://rsms.me/; img-src 'self' data:;">
     <title>Obliteration - Compatibility List</title>
     <meta name="description"
           content="Obliteration is an experimental open-source PS4 emulator written in Rust for Windows, MacOS, and Linux.">
@@ -83,7 +84,7 @@
 
         <label>
             <input autocomplete="off" type="text" name="obliteration" class="compMenuSearchBar"
-                   placeholder="GAME TITLE / ID" id="gameSearch" oninput="OnCompMenuSearch()">
+                   placeholder="GAME TITLE / ID" id="gameSearch">
         </label>
 
     </div>
@@ -115,16 +116,14 @@
     <div class="endMenu">
 
         <div class="pageBarContainer">
-            <img class="pageBarImage pageBarImageR" alt="Arrow pointing Backwards" src="/_images/arrow_forward.svg"
-                 onclick="PageSelectorUpdater('less')">
-            <p class="pageBarText" id="pageSelectorMin" onclick="PageSelectorUpdater('min')"></p>
+            <img class="pageBarImage pageBarImageR" id="pageSelectorLess" alt="Arrow pointing Backwards" src="/_images/arrow_forward.svg">
+            <p class="pageBarText" id="pageSelectorMin"></p>
             <label>
                 <input autocomplete="off" type="number" min="1" name="obliteration" class="pageBarSearch"
-                       placeholder="..." id="pageSelectorSearch" oninput="OnPageSelectorSearch()">
+                       placeholder="..." id="pageSelectorSearch">
             </label>
-            <p class="pageBarText" id="pageSelectorMax" onclick="PageSelectorUpdater('max')"></p>
-            <img class="pageBarImage" alt="Arrow pointing Forwards" src="/_images/arrow_forward.svg"
-                 onclick="PageSelectorUpdater('more')">
+            <p class="pageBarText" id="pageSelectorMax"></p>
+            <img class="pageBarImage" id="pageSelectorMore" alt="Arrow pointing Forwards" src="/_images/arrow_forward.svg">
         </div>
 
         <h4 class="endMenuInfoText" id="infoText">Fetching Results</h4>

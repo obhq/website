@@ -124,10 +124,10 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 
 // Searching in the game menu
-function OnCompMenuSearch() {
+document.getElementById("gameSearch").addEventListener('input', () => {
     currentPage = 1;
     updateSearchResults();
-}
+})
 
 
 // it searches the json and updates any needed variables
@@ -289,6 +289,7 @@ function gameCardHandler(jsonData) {
 }
 
 
+
 // updates the values of the page selector and handles the changing of the page number
 function PageSelectorUpdater(state) {
     const minNumberElement = document.getElementById("pageSelectorMin");
@@ -357,7 +358,7 @@ function PageSelectorUpdater(state) {
 
 
 // gets called when the onInput is called on the page selector "search bar"
-function OnPageSelectorSearch() {
+document.getElementById("pageSelectorSearch").addEventListener('input', () => {
     clearTimeout(Timer);
 
     Timer = setTimeout(() => {
@@ -365,4 +366,9 @@ function OnPageSelectorSearch() {
         PageSelectorUpdater("search");
 
     }, 700);
-}
+});
+
+document.getElementById("pageSelectorMin").addEventListener('click', () => PageSelectorUpdater('min'));
+document.getElementById("pageSelectorMax").addEventListener('click', () => PageSelectorUpdater('max'));
+document.getElementById("pageSelectorMore").addEventListener('click', () => PageSelectorUpdater('more'));
+document.getElementById("pageSelectorLess").addEventListener('click', () => PageSelectorUpdater('less'));
