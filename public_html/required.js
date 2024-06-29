@@ -142,8 +142,8 @@ async function init() {
     document.getElementById("header").outerHTML = header_html;
     document.getElementById("menu").outerHTML = menu_html;
 
-    document.getElementById("menuButton").addEventListener("click", () => menuButton);
-    document.getElementById("menu").addEventListener("click", () => menuButton);
+    document.getElementById("menuButton").addEventListener("click", () => menuButton());
+    document.getElementById("menu").addEventListener("click", () => menuButton());
 
     // Animation, 
     let imagesLoaded = 0;
