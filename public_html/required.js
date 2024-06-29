@@ -125,13 +125,13 @@ async function init() {
                     <a href="https://discord.gg/Qsdaxj6tnH" target="_blank" rel="noopener" style="display: flex;">
                         <img class="headerRightIconDiscord" src="/_images/discord.svg" alt="Discord logo">
                     </a>
-                    <img class="headerRightIconMenu" src="/_images/menu.svg" onclick="menuButton()" id="menuButton" alt="Mobile menu button">
+                    <img class="headerRightIconMenu" src="/_images/menu.svg" id="menuButton" alt="Mobile menu button">
                 </div>
             </div>
         </header>`;
 
     let menu_html = `
-        <div class="menuContainer NoOpacity" id="menu" onclick="menuButton()">
+        <div class="menuContainer NoOpacity" id="menu">
             <div class="menu">
                 <a class="menuLink" href="/download">Download</a>
                 <a class="menuLink" href="/compatibility">Compatibility</a>
@@ -141,6 +141,9 @@ async function init() {
 
     document.getElementById("header").outerHTML = header_html;
     document.getElementById("menu").outerHTML = menu_html;
+
+    document.getElementById("header").addEventListener("click", () => menuButton);
+    document.getElementById("menu").addEventListener("click", () => menuButton);
 
     // Animation, 
     let imagesLoaded = 0;
