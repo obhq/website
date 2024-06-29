@@ -202,7 +202,7 @@ body {
 }
 
 /* most phones... i think? (hope) */
-@media (min-height: 520px) and (max-width: 460px) {
+@media (max-width: 650px) {
     .headerRightIcons {
         gap: 10px;
     }

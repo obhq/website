@@ -11,16 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - .yml files for automatic releases
 - Modified rust comp updater to get the secrets using the environmental variables
+- Added CSP to the pages
 
 #### Changed
 
 - Changed directories of the website
 - Aesthetic changes and error handling improvements to the rust comp updater
+- Fixed the top bar changing its width when typing on the comp page
 
 #### Removed
 
 - Removed Coming soon page
 - Removed `Gamma-Boi`
+- Removed inline javascript
 
 ### [v0.2.0]
 
