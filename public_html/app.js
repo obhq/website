@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     await init();
     adjustScreenSize(700); // ensure change of top image
     headerShadow();
-    animationHandler(700);
+    animationHandler();
 
     window.addEventListener('resize', () => {
         adjustScreenSize(700);
