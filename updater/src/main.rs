@@ -212,7 +212,7 @@ fn main() {
                         &config.ps4_useragent,
                         image_path,
                         &code,
-                        &secrets.tmdb_hex,
+                        &config.tmdb_hex,
                     )) {
                         Ok(_) => image_exists = true,
                         Err(err) => {

@@ -10,6 +10,7 @@ pub(crate) struct Config {
     pub main_api_url: String,
     pub ps4_useragent: String,
     pub workflow_url: String,
+    pub tmdb_hex: String,
 
     pub game_images_folder: String,
     pub homebrew_images_folder: String,
@@ -29,7 +30,6 @@ pub(crate) struct Config {
 pub(crate) struct Secrets {
     pub(crate) github_api_token: String,
     pub(crate) homebrew_api_token: String,
-    pub(crate) tmdb_hex: String,
 }
 
 pub(crate) fn config_creator() -> anyhow::Result<(Config, Secrets)> {
@@ -46,6 +46,7 @@ pub(crate) fn config_creator() -> anyhow::Result<(Config, Secrets)> {
                 main_api_url: "https://api.github.com/repos/obhq/obliteration".to_string(),
                 ps4_useragent: "Mozilla/5.0 (PlayStation; PlayStation 4/11.00) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15".to_string(),
                 workflow_url: "https://api.github.com/repos/obhq/obliteration/actions/workflows/36859008/runs".to_string(),
+                tmdb_hex: "".to_string(),
 
                 game_images_folder: "./images/games/".to_string(),
                 homebrew_images_folder: "./images/hb/".to_string(),
@@ -127,10 +128,6 @@ pub(crate) fn config_creator() -> anyhow::Result<(Config, Secrets)> {
         homebrew_api_token: match env::var("HOMEBREW_API_TOKEN") {
             Ok(value) => value.to_string(),
             _ => panic_red!("Error while getting the env variable: \"HOMEBREW_API_TOKEN\""),
-        },
-        tmdb_hex: match env::var("TMDB_HEX") {
-            Ok(value) => value.to_string(),
-            _ => panic_red!("Error while getting the env variable: \"TMDB_HEX\""),
         },
     };
 

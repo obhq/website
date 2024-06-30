@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://rsms.me/; font-src 'self' https://rsms.me/; img-src 'self' data:;" >
     <title>Obliteration - 500</title>
     <meta name="description" content="Obliteration is an experimental open-source PS4 emulator written inmade for Windows, MacOS, and Linux.">
     <meta name="keywords" content="Obliteration, playstation, ps4, playstation 4, emulator, windows, macOS, linux, open-source, rust, C++, obliteration github, obliteration discord, obliteration wiki">
@@ -23,27 +24,27 @@
     <link rel="preconnect" href="https://rsms.me/">
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
     <link rel="stylesheet" href="/required.css">
-    <link rel="stylesheet" href="/_errorPages/errstyles.css">
+    <link rel="stylesheet" href="errstyles.css">
+    <script defer src="/required.js"></script>
+    <script src="errapp.js"></script>
     <meta name="darkreader-lock"> <!-- for disabling dark mode with dark reader -->
 </head>
 <body>
-<header class="header" id="header"></header>
-<div class="menuContainer" id="menu"></div>
+    <header class="header" id="header"></header>
+    <div class="menuContainer" id="menu"></div>
 
-<main class="main">
-    <div class="mainBackground">
-        <div class="mainBackground1"></div>
-        <div class="mainBackground2"></div>
-    </div>
-    <div class="mainContent">
-        <p class="mainContentBig mainContentText1">Unimplemented Syscall:
-            <span class="mainContentBig text-themed-err">500</span>!</p>
-        <p class="mainContentSmoll mainContentText2">Seems like the server encountered an issue! <br>Maybe
-            <a class="mainContentSmoll text-themed-err" href="javascript:location.reload()">try again?</a>
-        </p>
-    </div>
-</main>
+    <main class="main">
+        <div class="mainBackground">
+            <div class="mainBackground1"></div>
+            <div class="mainBackground2"></div>
+        </div>
+        <div class="mainContent">
+            <p class="mainContentBig mainContentText1">Unimplemented Syscall:
+                <span class="mainContentBig text-themed-err">500</span>!</p>
+            <p class="mainContentSmoll mainContentText2">Seems like the server encountered an issue! <br>Maybe
+                <a class="mainContentSmoll text-themed-err" id="reloadButton" style="cursor: pointer">try again?</a>
+            </p>
+        </div>
+    </main>
 </body>
-<script defer src="/required.js"></script>
-<script src="/_errorPages/errapp.js"></script>
 </html>

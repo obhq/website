@@ -2,12 +2,15 @@ compat_api_url = "https://api.github.com/repos/obhq/compatibility"
 main_api_url = "https://api.github.com/repos/obhq/obliteration"
 ps4_useragent = "Mozilla/5.0 (PlayStation; PlayStation 4/11.00) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15"
 workflow_url = "https://api.github.com/repos/obhq/obliteration/actions/workflows/36859008/runs"
+tmdb_hex = "F5DE66D2680E255B2DF79E74F890EBF349262F618BCAE2A9ACCDEE5156CE8DF2CDF2D48C71173CDC2594465B87405D197CF1AED3B7E9671EEB56CA6753C2E6B0"
+
 game_images_folder = "/home/runner/work/obhqWebsite/temp/updater/images/games/"
 homebrew_images_folder = "/home/runner/work/obhqWebsite/temp/updater/images/hb/"
 homebrew_database = "./HBstore.db"
 game_skips_database = "./game_skips.json"
 database = "/home/runner/work/obhqWebsite/temp/updater/database.json"
 stats_file = "/home/runner/work/obhqWebsite/temp/updater/stats.json"
+
 tag_homebrew = 6164722453
 tag_playable = 6164497050
 tag_ingame = 6164500133
